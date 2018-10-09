@@ -53,6 +53,12 @@ You can find the other parameters in [variables.tf](variables.tf).
 Check out the [examples folder](https://github.com/gruntwork-io/terraform-aws-influx/tree/master/examples) for 
 fully-working sample code.
 
+## Why InfluxDB enterprise?
+
+Unlike the Enterprise edition which distributes the entire InfluxDB deployment across multiple meta and data nodes in a cluster,
+the OSS edition is a single binary that can simply be installed on a single instance. This makes a robust module like this one
+quite unnecessary for single instance InfluxDB OSS deployments.
+
 ## How do you connect to the InfluxDB cluster?
 
 While InfluxDB doesn't use a load balancer for intra-cluster communication, one can be optionally setup to communicate
@@ -83,7 +89,17 @@ module. You pass in the ID of the AMI to run using the `ami_id` input parameter.
 ### EBS Volumes
 
 This module can optionally create an [EBS volume](https://aws.amazon.com/ebs/) for each EC2 Instance in the ASG. You 
-can use these volume to store InfluxDB data and are mandotory for InfluxDB data nodes. 
+can use these volume to store InfluxDB data and are mandotory for InfluxDB data nodes.
+
+We recommend a single EBS volume for the meta nodes for storing its Raft database. Two
+volumes for data nodes, one volume to store the `/data` directory and another for the
+`/meta`, `/wal`, and `/hh` direcotries.
+
+### Backup and Replication
+
+Setting up an adequate backup and recovery mechanism fo your cluster is hugely important. InfluxDB when used with some
+other components of the [TICK stack](https://www.influxdata.com/time-series-platform/) has a very capable multi-datacenter
+and cross-cluster replication system. You can find more information of InfluxDB disaster recovery [here](https://www.influxdata.com/blog/multiple-data-center-replication-influxdb/).
 
 ### Security Group
 
@@ -101,9 +117,19 @@ module to open up all the ports necessary for InfluxDB.
 Each EC2 Instance in the ASG has an [IAM Role](http://docs.aws.amazon.com/IAM/latest/UserGuide/id_roles.html) attached. 
 The IAM Role ARN and ID are exported as output variables if you need to add additional permissions.
 
+### How do you roll out updates?
+
+This module currently doesn't support updating the version of InfluxDB installed across the cluster. You can however follow
+this [guide](https://docs.influxdata.com/enterprise_influxdb/v1.6/administration/upgrading/) to manually perform the upgrade.
+
 ### Dedicated instances
 
 If you wish to use dedicated instances, you can set the `tenancy` parameter to `"dedicated"` in this module. 
+
+### Encryption
+
+This module does not currently support specifying encryption information. The official [documentation](
+https://docs.influxdata.com/influxdb/v1.6/administration/https_setup/) contains a guide for enabling SSL.
 
 ### Security groups
 
