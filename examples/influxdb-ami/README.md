@@ -6,7 +6,7 @@ modules with [Packer](https://www.packer.io/) to create [Amazon Machine
 Images (AMIs)](http://docs.aws.amazon.com/AWSEC2/latest/UserGuide/AMIs.html) that have 
 [InfluxDB Enterprise](https://www.influxdata.com/time-series-platform/influxdb/), and its dependencies installed on top of:
  
-1. Ubuntu 16.04
+1. Ubuntu 18.04
 1. Amazon Linux 2
 
 ## Quick start
