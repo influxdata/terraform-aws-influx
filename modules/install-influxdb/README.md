@@ -49,9 +49,9 @@ This script can be used to install InfluxDB and its dependencies. This script ha
 
 Options:
 
-  --version		        The version of InfluxDB to install. Default: 1.6.2.
-  --meta-config-file	Path to a templated meta node configuration file. Default: /tmp/config/influxdb-meta.conf
-  --data-config-file	Path to a templated data node configuration file. Default: /tmp/config/influxdb.conf
+  --version           The version of InfluxDB to install. Default: 1.6.2.
+  --meta-config-file  Path to a templated meta node configuration file. Default: /tmp/config/influxdb-meta.conf
+  --data-config-file  Path to a templated data node configuration file. Default: /tmp/config/influxdb.conf
 
 Example:
 
