@@ -1,0 +1,79 @@
+{
+  "min_packer_version": "0.12.0",
+  "variables": {
+    "aws_region": "us-east-1",
+    "base_ami_name": "influxdb",
+    "version": "1.6.2"
+  },
+  "builders": [{
+    "name": "influxdb-ami-ubuntu",
+    "ami_name": "{{user `base_ami_name`}}-ubuntu-example-{{isotime | clean_ami_name}}",
+    "ami_description": "An Ubuntu 18.04 AMI that has InfluxDB Enterprise installed.",
+    "instance_type": "t2.micro",
+    "region": "{{user `aws_region`}}",
+    "type": "amazon-ebs",
+    "source_ami_filter": {
+      "filters": {
+        "virtualization-type": "hvm",
+        "architecture": "x86_64",
+        "name": "*ubuntu-bionic-18.04-amd64-server-*",
+        "block-device-mapping.volume-type": "gp2",
+        "root-device-type": "ebs"
+      },
+      "owners": ["099720109477"],
+      "most_recent": true
+    },
+    "ssh_username": "ubuntu"
+  },{
+    "name": "influxdb-ami-amazon-linux",
+    "ami_name": "{{user `base_ami_name`}}-amazon-linux-example-{{isotime | clean_ami_name}}",
+    "ami_description": "An Amazon Linux 2 AMI that has InfluxDB Enterprise installed.",
+    "instance_type": "t2.micro",
+    "region": "{{user `aws_region`}}",
+    "type": "amazon-ebs",
+    "source_ami_filter": {
+      "filters": {
+        "virtualization-type": "hvm",
+        "architecture": "x86_64",
+        "name": "amzn2-ami-hvm-*-x86_64-gp2",
+        "block-device-mapping.volume-type": "gp2",
+        "root-device-type": "ebs"
+      },
+      "owners": ["amazon"],
+      "most_recent": true
+    },
+    "ssh_username": "ec2-user"
+  }],
+  "provisioners": [{
+    "type": "shell",
+    "pause_before": "30s",
+    "inline": [
+      "sudo yum update -y",
+      "sudo yum install -y git"
+    ],
+    "only": ["influxdb-ami-amazon-linux"]
+  },{
+    "type": "shell",
+    "inline": [
+      "sudo mkdir -p /opt/gruntwork",
+      "git clone --branch v0.0.6 https://github.com/gruntwork-io/bash-commons.git /tmp/bash-commons",
+      "sudo cp -r /tmp/bash-commons/modules/bash-commons/src /opt/gruntwork/bash-commons"
+    ]
+  },{
+    "type": "file",
+    "source": "{{template_dir}}/config",
+    "destination": "/tmp"
+  },{
+    "type": "shell",
+    "inline": ["mkdir -p /tmp/terraform-aws-influx"]
+  },{
+    "type": "file",
+    "source": "{{template_dir}}/../../",
+    "destination": "/tmp/terraform-aws-influx"
+  },{
+    "type": "shell",
+    "inline": [
+      "/tmp/terraform-aws-influx/modules/install-influxdb/install-influxdb --version {{user `version`}}"
+    ]
+  }]
+}
