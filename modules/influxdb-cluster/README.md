@@ -1,6 +1,6 @@
 # InfluxDB Cluster
 
-This folder contains a [Terraform](https://www.terraform.io/) module to deploy an [InfluxDB](
+This folder contains a [Terraform](https://www.terraform.io/) module to deploy an [InfluxDB Enterprise](
 https://www.influxdata.com/time-series-platform/influxdb/) cluster in [AWS](https://aws.amazon.com/) on top of an Auto Scaling Group. 
 The idea is to create an [Amazon Machine Image (AMI)](http://docs.aws.amazon.com/AWSEC2/latest/UserGuide/AMIs.html)
 that has InfluxDB meta and data binaries installed using the [install-influxdb](
@@ -91,9 +91,8 @@ module. You pass in the ID of the AMI to run using the `ami_id` input parameter.
 This module can optionally create an [EBS volume](https://aws.amazon.com/ebs/) for each EC2 Instance in the ASG. You 
 can use these volume to store InfluxDB data and are mandotory for InfluxDB data nodes.
 
-We recommend a single EBS volume for the meta nodes for storing its Raft database. Two
-volumes for data nodes, one volume to store the `/data` directory and another for the
-`/meta`, `/wal`, and `/hh` direcotries.
+We recommend a single EBS volume for the meta nodes for storing its Raft database. And one for data nodes,
+to store the `/data`, `/meta`, `/wal`, and `/hh` direcotries.
 
 ### Backup and Replication
 

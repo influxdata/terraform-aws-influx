@@ -4,7 +4,7 @@ This folder shows an example of how to use the
 [install-influxdb](https://github.com/gruntwork-io/terraform-aws-influx/tree/master/modules/install-influxdb)
 modules with [Packer](https://www.packer.io/) to create [Amazon Machine 
 Images (AMIs)](http://docs.aws.amazon.com/AWSEC2/latest/UserGuide/AMIs.html) that have 
-[InfluxDB](https://www.influxdata.com/time-series-platform/influxdb/), and its dependencies installed on top of:
+[InfluxDB Enterprise](https://www.influxdata.com/time-series-platform/influxdb/), and its dependencies installed on top of:
  
 1. Ubuntu 16.04
 1. Amazon Linux 2

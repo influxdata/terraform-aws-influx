@@ -1,7 +1,7 @@
 # InfluxDB Server Security Group Rules Module
 
 This folder contains a [Terraform](https://www.terraform.io/) module that defines the Security Group rules used by a 
-[InfluxDB](https://www.influxdata.com/time-series-platform/influxdb/) cluster to control the traffic that is allowed to go in and out of the cluster. 
+[InfluxDB Enterprise](https://www.influxdata.com/time-series-platform/influxdb/) cluster to control the traffic that is allowed to go in and out of the cluster. 
 These rules are defined in a separate module so that you can add them to any existing Security Group. 
 
 ## Quick start

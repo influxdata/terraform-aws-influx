@@ -1,7 +1,7 @@
 # InfluxDB IAM Policies
 
 This folder contains a [Terraform](https://www.terraform.io/) module that defines the IAM Policies used by an
-[InfluxDB](https://www.influxdata.com/time-series-platform/influxdb/) cluster.
+[InfluxDB Enterprise](https://www.influxdata.com/time-series-platform/influxdb/) cluster.
 These policies are defined in a separate module so that you can add them to any existing IAM Role. 
 
 ## Quick start

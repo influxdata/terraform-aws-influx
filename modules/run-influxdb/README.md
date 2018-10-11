@@ -69,7 +69,7 @@ The `run-influxdb` script can automatically pick a rally point automatically by:
 
 1. Looking up all the servers in the Auto Scaling Group specified via the `--cluster-name` parameter.
 
-1. Pick the node with the oldest Launch Time as the rally point. If multiple nodes have identical launch times, use the
+1. Pick the meta node with the oldest Launch Time as the rally point. If multiple nodes have identical launch times, use the
    one with the earliest Instance ID, alphabetically.
    
 If you wish to specify a rally point manually instead of relying on this automatic process, use the 

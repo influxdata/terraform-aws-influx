@@ -2,7 +2,7 @@
 
 The root folder of this repo shows an example of Terraform code that uses the
 [influxdb-cluster](https://github.com/gruntwork-io/terraform-aws-influx/tree/master/modules/influxdb-cluster) 
-module to deploy a [InfluxDB](https://www.influxdata.com/time-series-platform/influxdb/) cluster in [AWS](https://aws.amazon.com/). The cluster 
+module to deploy a [InfluxDB Enterprise](https://www.influxdata.com/time-series-platform/influxdb/) cluster in [AWS](https://aws.amazon.com/). The cluster 
 consists of one Auto Scaling Group (ASG) that runs InfluxDB:
 
 This example also deploys a Load Balancer in front of the InfluxDB cluster using the [load-balancer
