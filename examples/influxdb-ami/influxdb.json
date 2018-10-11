@@ -43,6 +43,16 @@
       "most_recent": true
     },
     "ssh_username": "ec2-user"
+  },{
+    "name": "influxdb-docker-ubuntu",
+    "type": "docker",
+    "image": "ubuntu:18.04",
+    "commit": "true"
+  },{
+    "name": "influxdb-docker-amazon-linux",
+    "type": "docker",
+    "image": "amazonlinux:2",
+    "commit": "true"
   }],
   "provisioners": [{
     "type": "shell",
@@ -52,6 +62,20 @@
       "sudo yum install -y git"
     ],
     "only": ["influxdb-ami-amazon-linux"]
+  },{
+    "type": "shell",
+    "inline": [
+      "DEBIAN_FRONTEND=noninteractive apt-get update -y",
+      "apt-get install -y sudo wget git"
+    ],
+    "only": ["influxdb-docker-ubuntu"]
+  },{
+    "type": "shell",
+    "inline": [
+      "yum update -y",
+      "yum install -y sudo wget git"
+    ],
+    "only": ["influxdb-docker-amazon-linux"]
   },{
     "type": "shell",
     "inline": [
@@ -75,5 +99,16 @@
     "inline": [
       "/tmp/terraform-aws-influx/modules/install-influxdb/install-influxdb --version {{user `version`}}"
     ]
+  }],
+  "post-processors": [{
+    "type": "docker-tag",
+    "repository": "gruntwork/influxdb-ubuntu",
+    "tag": "latest",
+    "only": ["influxdb-docker-ubuntu"]
+  },{
+    "type": "docker-tag",
+    "repository": "gruntwork/influxdb-amazon-linux",
+    "tag": "latest",
+    "only": ["influxdb-docker-amazon-linux"]
   }]
 }
