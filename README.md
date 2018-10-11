@@ -42,7 +42,7 @@ The general idea is to:
    [run-influxdb](https://github.com/gruntwork-io/terraform-aws-influx/tree/master/modules/run-influxdb)
    script during boot.
 
-1. (Optional): Deploy a load balancer in front of the data node ASG.
+1. Deploy a load balancer in front of the data node ASG.
 
 See the [examples folder](https://github.com/gruntwork-io/terraform-aws-influx/tree/master/examples) for working
 sample code.
