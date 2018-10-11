@@ -45,13 +45,13 @@ Run `install-influxdb --help` to see all available arguments.
 ```
 Usage: install-influxdb [options]
 
-This script can be used to install InfluxDB and its dependencies. This script has been tested with Ubuntu 16.04 and Amazon Linux 2.
+This script can be used to install InfluxDB and its dependencies. This script has been tested with Ubuntu 18.04 and Amazon Linux 2.
 
 Options:
 
-  --version		          The version of InfluxDB to install. Default: 1.6.2.
-  --meta-config-file		Optional path to a templated meta node configuration file.
-  --data-config-file		Optional path to a templated data node configuration file.
+  --version		        The version of InfluxDB to install. Default: 1.6.2.
+  --meta-config-file	Path to a templated meta node configuration file. Default: /tmp/config/influxdb-meta.conf
+  --data-config-file	Path to a templated data node configuration file. Default: /tmp/config/influxdb.conf
 
 Example:
 

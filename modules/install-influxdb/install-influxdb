@@ -23,7 +23,7 @@ function print_usage {
   echo
   echo "Usage: install-influxdb [options]"
   echo
-  echo "Install InfluxDB on this machine."
+  echo "This script can be used to install InfluxDB and its dependencies. This script has been tested with Ubuntu 18.04 and Amazon Linux 2."
   echo
   echo "Options:"
   echo
