@@ -23,11 +23,11 @@ function print_usage {
   echo
   echo "Usage: install-influxdb [options]"
   echo
-  echo "This script can be used to install InfluxDB and its dependencies. This script has been tested with Ubuntu 18.04 and Amazon Linux 2."
+  echo "This script can be used to install InfluxDB Enterprise and its dependencies. This script has been tested with Ubuntu 18.04 and Amazon Linux 2."
   echo
   echo "Options:"
   echo
-  echo -e "  --version\t\tThe version of InfluxDB to install. Default: $DEFAULT_INFLUXDB_VERSION."
+  echo -e "  --version\t\tThe version of InfluxDB Enterprise to install. Default: $DEFAULT_INFLUXDB_VERSION."
   echo -e "  --meta-config-file\tPath to a templated meta node configuration file. Default: $DEFAULT_TEMP_META_CONFIG_FILE_PATH"
   echo -e "  --data-config-file\tPath to a templated data node configuration file. Default: $DEFAULT_TEMP_DATA_CONFIG_FILE_PATH"
 
