@@ -148,6 +148,10 @@ function start_influxdb {
     log_info "Restarting InfluxDB Data Service"
     sudo service influxdb restart
   fi
+
+  # The services need a few seconds to fully initialize
+  # before we start hitting them with cluster operation requests
+  sleep 5
 }
 
 function run_influxdb {
@@ -219,16 +223,25 @@ function run_influxdb {
   node_hostname=$(hostname)
 
   if [[ "$node_hostname" == "$rally_point_hostname" ]]; then
-    log_info "This server is the rally point for the cluster."
-    influxd-ctl add-meta "$node_hostname:8091"
-    return
-  fi
 
-  log_info "The rally point for the cluster is $rally_point_hostname"
-  if [[ "$node_type" == "meta" ]]; then
-    influxd-ctl -bind "$rally_point_hostname:8091" add-meta "$node_hostname:8091"
+    log_info "This server is the rally point for the cluster."
+
+    if [[ "$node_type" == "meta" ]]; then
+      influxd-ctl add-meta "$node_hostname:8091"
+    else
+      influxd-ctl add-data "$node_hostname:8088"
+    fi
+
   else
-    influxd-ctl -bind "$rally_point_hostname:8091" add-data "$node_hostname:8088"
+
+    log_info "The rally point for the cluster is $rally_point_hostname"
+
+    if [[ "$node_type" == "meta" ]]; then
+      influxd-ctl -bind "$rally_point_hostname:8091" add-meta "$node_hostname:8091"
+    else
+      influxd-ctl -bind "$rally_point_hostname:8091" add-data "$node_hostname:8088"
+    fi
+
   fi
 
 }
