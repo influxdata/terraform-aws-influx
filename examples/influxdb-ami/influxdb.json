@@ -58,22 +58,29 @@
     "type": "shell",
     "pause_before": "30s",
     "inline": [
+      "DEBIAN_FRONTEND=noninteractive sudo apt-get update -y",
+      "sudo apt-get install -y jq"
+    ],
+    "only": ["influxdb-ami-ubuntu"]
+  },{
+    "type": "shell",
+    "inline": [
       "sudo yum update -y",
-      "sudo yum install -y git"
+      "sudo yum install -y git jq"
     ],
     "only": ["influxdb-ami-amazon-linux"]
   },{
     "type": "shell",
     "inline": [
       "DEBIAN_FRONTEND=noninteractive apt-get update -y",
-      "apt-get install -y sudo wget git"
+      "apt-get install -y sudo wget git jq systemd"
     ],
     "only": ["influxdb-docker-ubuntu"]
   },{
     "type": "shell",
     "inline": [
       "yum update -y",
-      "yum install -y sudo wget git"
+      "yum install -y sudo wget git jq hostname"
     ],
     "only": ["influxdb-docker-amazon-linux"]
   },{
