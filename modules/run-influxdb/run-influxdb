@@ -65,6 +65,27 @@ function auto_fill_param {
   file_replace_text "$placeholder_name" "$placeholder_value" "$config"
 }
 
+function get_rally_point_hostname {
+  local -r asg_name="$1"
+  local -r region="$2"
+
+  log_info "Looking up rally point for ASG $asg_name in $region"
+
+  local instances
+  instances=$(aws_wrapper_wait_for_instances_in_asg "$asg_name" "$region")
+  assert_not_empty_or_null "$instances" "Fetch list of Instances in ASG $asg_name"
+
+  local rally_point
+  rally_point=$(echo "$instances" | jq -r '[.Reservations[].Instances[]] | sort_by(.LaunchTime, .InstanceId) | .[0]')
+  assert_not_empty_or_null "$rally_point" "Select rally point server in ASG $asg_name"
+
+  local hostname
+  hostname=$(echo "$rally_point" | jq -r ".PrivateDnsName")
+  assert_not_empty_or_null "$hostname" "Get private hostname for rally point in $asg_name: $rally_point"
+
+  echo -n "$hostname"
+}
+
 function discover_all_nodes {
   local -r meta_asg_name="$1"
   local -r data_asg_name="$2"
@@ -120,12 +141,12 @@ function discover_nodes {
 function start_influxdb {
   local -r node_type="$1"
 
-  if [[ $node_type == "meta" ]]; then
-    log_info "Starting InfluxDB Meta Service"
-    sudo systemctl start influxdb-meta
+  if [[ "$node_type" == "meta" ]]; then
+    log_info "Restarting InfluxDB Meta Service"
+    sudo service influxdb-meta restart
   else
-    log_info "Starting InfluxDB Data Service"
-    sudo systemctl start influxdb
+    log_info "Restarting InfluxDB Data Service"
+    sudo service influxdb restart
   fi
 }
 
@@ -184,7 +205,7 @@ function run_influxdb {
   assert_not_empty "--data-asg-name" "$data_asg_name"
   assert_not_empty "--region" "$region"
 
-  if [[ $node_type == "meta" ]]; then
+  if [[ "$node_type" == "meta" ]]; then
     auto_fill_config "$DEFAULT_META_CONFIG_FILE_PATH" "${auto_fill[@]}"
   else
     auto_fill_config "$DEFAULT_DATA_CONFIG_FILE_PATH" "${auto_fill[@]}"
@@ -192,6 +213,24 @@ function run_influxdb {
 
   discover_all_nodes "$meta_asg_name" "$data_asg_name" "$region"
   start_influxdb "$node_type"
+
+  local rally_point_hostname
+  rally_point_hostname=$(get_rally_point_hostname "$meta_asg_name" "$region")
+  node_hostname=$(hostname)
+
+  if [[ "$node_hostname" == "$rally_point_hostname" ]]; then
+    log_info "This server is the rally point for the cluster."
+    influxd-ctl add-meta "$node_hostname:8091"
+    return
+  fi
+
+  log_info "The rally point for the cluster is $rally_point_hostname"
+  if [[ "$node_type" == "meta" ]]; then
+    influxd-ctl -bind "$rally_point_hostname:8091" add-meta "$node_hostname:8091"
+  else
+    influxd-ctl -bind "$rally_point_hostname:8091" add-data "$node_hostname:8088"
+  fi
+
 }
 
 run_influxdb "$@"
