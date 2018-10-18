@@ -17,9 +17,11 @@ services:
 
       # Mount these scripts so we get hot reload
       - ../../modules/run-influxdb/run-influxdb:/opt/influxdb/bin/run-influxdb
+      - ../../modules/influxdb-commons:/opt/influxdb-commons
 
       # Override scripts with mocks so we can run locally, without talking to AWS APIs
       - ./local-mocks/aws.sh:/opt/gruntwork/bash-commons/aws.sh
+      - ./local-mocks/mount-volume.sh:/opt/influxdb-commons/mount-volume.sh
 
       # Mount the scripts we use to run InfluxDB during Docker container boot
       - ./user-data:/user-data
@@ -37,6 +39,9 @@ services:
       USER_DATA_ENV_license_key: ${LICENSE_KEY}
       USER_DATA_ENV_shared_secret: ${SHARED_SECRET}
       USER_DATA_ENV_data_node_container_base_name: ${CONTAINER_BASE_NAME}
+      USER_DATA_ENV_volume_device_name: /dev/xvdf
+      USER_DATA_ENV_volume_mount_point: /influxdb
+      USER_DATA_ENV_volume_owner: influxdb
     
     ports:
       # Map these ports to any available port number on the host
