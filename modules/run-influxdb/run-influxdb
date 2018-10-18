@@ -143,10 +143,10 @@ function start_influxdb {
 
   if [[ "$node_type" == "meta" ]]; then
     log_info "Restarting InfluxDB Meta Service"
-    sudo service influxdb-meta restart
+    sudo systemctl restart influxdb-meta.service
   else
     log_info "Restarting InfluxDB Data Service"
-    sudo service influxdb restart
+    sudo systemctl restart influxdb.service
   fi
 
   # The services need a few seconds to fully initialize
