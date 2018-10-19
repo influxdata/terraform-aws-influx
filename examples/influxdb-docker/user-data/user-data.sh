@@ -43,11 +43,6 @@ function run {
     --auto-fill "<__LICENSE_KEY__>=$license_key" \
     --auto-fill "<__META_DIR__>=$meta_dir"
 
-  # The services are configured to restart on error (which it will because the config files are in an invalid state at instance boot)
-  # we risk hitting the "Start request repeated too quickly" SystemD error. So we wait a few seconds before we run the data service
-  # See: https://serverfault.com/questions/845471/service-start-request-repeated-too-quickly-refusing-to-start-limit/845473#845473
-  sleep 5
-
   "/opt/influxdb/bin/run-influxdb" \
     --node-type "data" \
     --meta-asg-name "$asg_name" \
