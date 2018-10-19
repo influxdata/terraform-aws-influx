@@ -99,19 +99,15 @@ function discover_all_nodes {
 
   log_info "Writing node information to /etc/hosts"
 
-  echo "# Start Meta nodes" | sudo tee -a "/etc/hosts"
   for meta_host in "${meta_hosts[@]}"
   do
-    echo -e "$meta_host" | sudo tee -a "/etc/hosts"
+    file_replace_or_append_text "$meta_host" "$meta_host" "/etc/hosts"
   done
-  echo "# End Meta nodes" | sudo tee -a "/etc/hosts"
 
-  echo "# Start Data nodes" | sudo tee -a "/etc/hosts"
   for data_host in "${data_hosts[@]}"
   do
-    echo -e "$data_host" | sudo tee -a "/etc/hosts"
+    file_replace_or_append_text "$data_host" "$data_host" "/etc/hosts"
   done
-  echo "# End Data nodes" | sudo tee -a "/etc/hosts"
 }
 
 function discover_nodes {
