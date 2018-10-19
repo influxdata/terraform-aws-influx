@@ -139,9 +139,15 @@ function start_influxdb {
 
   if [[ "$node_type" == "meta" ]]; then
     log_info "Restarting InfluxDB Meta Service"
+
+    # The InfluxDB meta service is started at boot time,
+    # restart it so it can reload the configuration file
     sudo systemctl restart influxdb-meta.service
   else
     log_info "Restarting InfluxDB Data Service"
+
+    # The InfluxDB data service is started at boot time,
+    # restart it so it can reload the configuration file
     sudo systemctl restart influxdb.service
   fi
 
