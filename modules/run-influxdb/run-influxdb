@@ -138,11 +138,11 @@ function start_influxdb {
   local -r node_type="$1"
 
   if [[ "$node_type" == "meta" ]]; then
-    log_info "Restarting InfluxDB Meta Service"
+    log_info "Starting InfluxDB Meta Service"
     sudo systemctl enable influxdb-meta.service
     sudo systemctl start influxdb-meta.service
   else
-    log_info "Restarting InfluxDB Data Service"
+    log_info "Starting InfluxDB Data Service"
     sudo systemctl enable influxdb.service
     sudo systemctl start influxdb.service
   fi
