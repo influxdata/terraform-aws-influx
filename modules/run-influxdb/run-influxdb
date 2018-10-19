@@ -19,9 +19,9 @@ source "$BASH_COMMONS_DIR/log.sh"
 
 function print_usage {
   echo
-  echo "Usage: install-influxdb [options]"
+  echo "Usage: run-influxdb [options]"
   echo
-  echo "This script can be used to install InfluxDB Enterprise and its dependencies. This script has been tested with Ubuntu 18.04 and Amazon Linux 2."
+  echo "This script can be used to configure and initialize InfluxDB. This script has been tested with Ubuntu 18.04 and Amazon Linux 2."
   echo
   echo "Options:"
   echo

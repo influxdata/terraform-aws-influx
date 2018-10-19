@@ -41,7 +41,7 @@ Run `run-influxdb --help` to see all available arguments.
 ```
 Usage: run-influxdb [options]
 
-This script can be used to configure and initialize InfluxDB. This script has been tested with Ubuntu 16.04 and Amazon Linux 2.
+This script can be used to configure and initialize InfluxDB. This script has been tested with Ubuntu 18.04 and Amazon Linux 2.
 
 Options:
 
