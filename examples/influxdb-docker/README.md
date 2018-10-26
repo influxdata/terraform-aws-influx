@@ -11,7 +11,7 @@ example](https://github.com/gruntwork-io/terraform-aws-influx/tree/master/exampl
 image with InfluxDB installed on Ubuntu:
 
 ```
-packer build -only=ubuntu-docker influxdb.json
+packer build -only=influxdb-docker-ubuntu influxdb.json
 ```
 
 To run the Docker image, run:
@@ -23,7 +23,7 @@ docker-compose up
 Alternatively, to create an Amazon Linux Docker image:
 
 ```
-packer build -only=amazon-linux-docker influxdb.json
+packer build -only=influxdb-docker-amazon-linux influxdb.json
 ```
 
 And to run it:

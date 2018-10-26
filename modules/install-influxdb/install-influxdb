@@ -113,6 +113,13 @@ function install_influxdb {
 
   sudo mv "$meta_config_file" "$DEFAULT_META_CONFIG_FILE_PATH"
   sudo mv "$data_config_file" "$DEFAULT_DATA_CONFIG_FILE_PATH"
+
+  # Change owner of configuration files to influxdb user
+  sudo chown -R influxdb:influxdb "$(dirname "${DEFAULT_META_CONFIG_FILE_PATH}")"
+
+  # Disable the installed systemd services to prevent them from starting up on boot
+  sudo systemctl disable influxdb-meta.service
+  sudo systemctl disable influxdb.service
 }
 
 install_influxdb "$@"

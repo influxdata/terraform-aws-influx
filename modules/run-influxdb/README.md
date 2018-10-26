@@ -3,7 +3,7 @@
 This folder contains a script for configuring and initializing InfluxDB on an [AWS](https://aws.amazon.com/) server. 
 This script has been tested on the following operating systems:
 
-* Ubuntu 16.04
+* Ubuntu 18.04
 * Amazon Linux 2
 
 There is a good chance it will work on other flavors of Debian, CentOS, and RHEL as well.
@@ -41,18 +41,19 @@ Run `run-influxdb --help` to see all available arguments.
 ```
 Usage: run-influxdb [options]
 
-This script can be used to configure and initialize InfluxDB. This script has been tested with Ubuntu 16.04 and Amazon Linux 2.
+This script can be used to configure and initialize InfluxDB. This script has been tested with Ubuntu 18.04 and Amazon Linux 2.
 
 Options:
 
   --node-type        Specifies whether the instance will be a Meta or Data node. Must be one of 'meta' or 'data'.
   --meta-asg-name    The name of the ASG that contains meta nodes.
   --data-asg-name    The name of the ASG that contains data nodes.
+  --region           The AWS region the Auto Scaling Groups are deployed in.
   --auto-fill        Search the InfluxDB config file for KEY and replace it with VALUE. May be repeated.
 
 Example:
 
-  run-influxdb --node-type meta --meta-asg-name asg-meta --data-asg-name asg-data --auto-fill '<__LICENSE__>=/path/to/license'
+  run-influxdb --node-type meta --meta-asg-name asg-meta --data-asg-name asg-data --region us-east-1 --auto-fill '<__LICENSE_KEY__>=******'
 ```
 
 ## Picking a rally point
@@ -71,9 +72,6 @@ The `run-influxdb` script can automatically pick a rally point automatically by:
 
 1. Pick the meta node with the oldest Launch Time as the rally point. If multiple nodes have identical launch times, use the
    one with the earliest Instance ID, alphabetically.
-   
-If you wish to specify a rally point manually instead of relying on this automatic process, use the 
-`--rally-point-hostname` parameter.
 
 ## Required permissions
 
