@@ -37,34 +37,6 @@ function print_usage {
   echo "  run-influxdb  --node-type meta --meta-asg-name asg-meta --data-asg-name asg-data --region us-east-1 --auto-fill '<__LICENSE_KEY__>=******'"
 }
 
-function auto_fill_config {
-  local -r config="$1"
-  shift 1
-  local -ar auto_fill=("$@")
-
-  if [[ -z "${auto_fill[@]}" ]]; then
-    log_info "No auto-fill params specified."
-    return
-  fi
-
-  local param
-  for param in "${auto_fill[@]}"; do
-    auto_fill_param "$config" "$param"
-  done
-}
-
-function auto_fill_param {
-  local -r config="$1"
-  local -r param="$2"
-
-  # The param is of the format KEY=VALUE.
-  local -r placeholder_name="$(string_strip_suffix "$param" "=*")"
-  local -r placeholder_value="$(string_strip_prefix "$param" "*=")"
-
-  log_info "Replacing the '$placeholder_name' placeholder in $config with $placeholder_value"
-  file_replace_text "$placeholder_name" "$placeholder_value" "$config"
-}
-
 function get_rally_point_hostname {
   local -r asg_name="$1"
   local -r region="$2"
@@ -208,9 +180,9 @@ function run_influxdb {
   assert_not_empty "--region" "$region"
 
   if [[ "$node_type" == "meta" ]]; then
-    auto_fill_config "$DEFAULT_META_CONFIG_FILE_PATH" "${auto_fill[@]}"
+    file_fill_template "$DEFAULT_META_CONFIG_FILE_PATH" "${auto_fill[@]}"
   else
-    auto_fill_config "$DEFAULT_DATA_CONFIG_FILE_PATH" "${auto_fill[@]}"
+    file_fill_template "$DEFAULT_DATA_CONFIG_FILE_PATH" "${auto_fill[@]}"
   fi
 
   discover_all_nodes "$meta_asg_name" "$data_asg_name" "$region"
