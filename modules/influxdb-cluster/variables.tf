@@ -4,7 +4,7 @@
 # ---------------------------------------------------------------------------------------------------------------------
 
 variable "cluster_name" {
-  description = "The name of the Couchbase cluster (e.g. couchbase-stage). This variable is used to namespace all resources created by this module."
+  description = "The name of the InfluxDB cluster (e.g. influxdb-stage). This variable is used to namespace all resources created by this module."
 }
 
 variable "ami_id" {
@@ -16,15 +16,15 @@ variable "instance_type" {
 }
 
 variable "min_size" {
-  description = "The minimum number of nodes to have in the Couchbase cluster."
+  description = "The minimum number of nodes to have in the InfluxDB cluster."
 }
 
 variable "max_size" {
-  description = "The maximum number of nodes to have in the Couchbase cluster."
+  description = "The maximum number of nodes to have in the InfluxDB cluster."
 }
 
 variable "vpc_id" {
-  description = "The ID of the VPC in which to deploy the Couchbase cluster"
+  description = "The ID of the VPC in which to deploy the InfluxDB cluster"
 }
 
 variable "subnet_ids" {
