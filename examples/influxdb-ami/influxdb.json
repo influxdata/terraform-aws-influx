@@ -104,6 +104,13 @@
     "inline": [
       "/tmp/terraform-aws-influx/modules/install-influxdb/install-influxdb --version {{user `version`}}"
     ]
+  },{
+    "type": "shell",
+    "inline": [
+      "sudo cp -r /tmp/terraform-aws-influx/modules/influxdb-commons /opt",
+      "sudo mkdir -p /opt/influxdb/bin",
+      "sudo cp /tmp/terraform-aws-influx/modules/run-influxdb/run-influxdb /opt/influxdb/bin/run-influxdb"
+    ]
   }],
   "post-processors": [{
     "type": "docker-tag",
