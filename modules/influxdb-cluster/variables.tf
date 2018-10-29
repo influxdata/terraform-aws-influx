@@ -58,6 +58,11 @@ variable "allowed_ssh_security_group_ids" {
   default     = []
 }
 
+variable "allowed_ssh_security_group_ids_num" {
+  description = "The number of security group IDs in var.beats_port_security_groups. We should be able to compute this automatically, but due to a Terraform limitation, if there are any dynamic resources in var.allowed_ssh_security_group_ids, then we won't be able to: https://github.com/hashicorp/terraform/pull/11482"
+  default     = 0
+}
+
 variable "termination_policies" {
   description = "A list of policies to decide how the instances in the auto scale group should be terminated. The allowed values are OldestInstance, NewestInstance, OldestLaunchConfiguration, ClosestToNextInstanceHour, Default."
   default     = "Default"
