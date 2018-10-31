@@ -59,7 +59,7 @@
     "pause_before": "30s",
     "inline": [
       "DEBIAN_FRONTEND=noninteractive sudo apt-get update -y",
-      "sudo apt-get install -y jq"
+      "sudo apt-get install -y jq awscli"
     ],
     "only": ["influxdb-ami-ubuntu"]
   },{
