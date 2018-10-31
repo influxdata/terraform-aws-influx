@@ -26,8 +26,6 @@ module "influxdb_data_nodes" {
   
   cluster_name = "${var.cluster_name}"
   
-  health_check_type = "ELB"
-  
   # ... (other params omitted) ...
 }
 
@@ -44,10 +42,6 @@ module "load_balancer" {
 ``` 
 
 Note the following:
-
-* `health_check_type`: This parameter tells the InfluxDB cluster to use the load balancer for health checks, rather 
-  than the simpler EC2 health checks. This way, a server will be replaced as soon as it stops responding properly to
-  requests, rather than only if the EC2 Instance dies completely. 
 
 * `http_listener_ports`: This tells the Load Balancer to listen for HTTP requests on port 8091 and 4984.
   
