@@ -25,6 +25,7 @@ function print_usage {
   echo
   echo "Options:"
   echo
+  echo -e "  --hostname\t\tThe hostname of the current node."
   echo -e "  --node-type\t\tSpecifies whether the instance will be a Meta or Data node. Must be one of 'meta' or 'data'."
   echo -e "  --meta-asg-name\tThe name of the ASG that contains meta nodes."
   echo -e "  --data-asg-name\tThe name of the ASG that contains data nodes."
@@ -125,6 +126,7 @@ function start_influxdb {
 }
 
 function run_influxdb {
+  local node_hostname=""
   local node_type=""
   local meta_asg_name=""
   local data_asg_name=""
@@ -137,6 +139,11 @@ function run_influxdb {
       --help)
         print_usage
         exit
+        ;;
+      --hostname)
+        assert_not_empty "$key" "$2"
+        node_hostname="$2"
+        shift
         ;;
       --node-type)
         assert_not_empty "$key" "$2"
@@ -173,6 +180,7 @@ function run_influxdb {
     shift
   done
 
+  assert_not_empty "--hostname" "$node_hostname"
   assert_not_empty "--node-type" "$node_type"
   assert_value_in_list "--node-type" "$node_type" "meta" "data"
   assert_not_empty "--meta-asg-name" "$meta_asg_name"
@@ -190,7 +198,6 @@ function run_influxdb {
 
   local rally_point_hostname
   rally_point_hostname=$(get_rally_point_hostname "$meta_asg_name" "$region")
-  node_hostname=$(hostname)
 
   if [[ "$node_hostname" == "$rally_point_hostname" ]]; then
 
