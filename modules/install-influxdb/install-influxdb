@@ -4,11 +4,20 @@ set -e
 
 # Import the appropriate bash commons libraries
 readonly BASH_COMMONS_DIR="/opt/gruntwork/bash-commons"
+readonly SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
+
 readonly DEFAULT_INFLUXDB_VERSION="1.6.2"
+
 readonly DEFAULT_TEMP_META_CONFIG_FILE_PATH="/tmp/config/influxdb-meta.conf"
 readonly DEFAULT_TEMP_DATA_CONFIG_FILE_PATH="/tmp/config/influxdb.conf"
 readonly DEFAULT_META_CONFIG_FILE_PATH="/etc/influxdb/influxdb-meta.conf"
 readonly DEFAULT_DATA_CONFIG_FILE_PATH="/etc/influxdb/influxdb.conf"
+
+readonly DEFAULT_INFLUXDB_DIR="/opt/influxdb"
+readonly DEFAULT_INFLUXDB_BIN_DIR="$DEFAULT_INFLUXDB_DIR/bin"
+
+readonly INFLUXDB_COMMONS_SRC_DIR="$SCRIPT_DIR/../influxdb-commons"
+readonly INFLUXDB_COMMONS_INSTALL_DIR="/opt/influxdb-commons"
 
 if [[ ! -d "$BASH_COMMONS_DIR" ]]; then
   echo "ERROR: this script requires that bash-commons is installed in $BASH_COMMONS_DIR. See https://github.com/gruntwork-io/bash-commons for more info."
@@ -59,6 +68,25 @@ function install_influxdb_on_amazon_linux {
   log_info "Installing InfluxDB Enterprise Data service"
   sudo wget "https://dl.influxdata.com/enterprise/releases/influxdb-data-${version}_c${version}.x86_64.rpm"
   sudo yum localinstall -y "influxdb-data-${version}_c${version}.x86_64.rpm"
+}
+
+function install_influxdb_scripts {
+  local -r dest_dir="$1"
+
+  local -r run_influxdb_src="$SCRIPT_DIR/../run-influxdb/run-influxdb"
+  local -r run_influxdb_dest="$dest_dir/run-influxdb"
+
+  log_info "Copying $run_influxdb_src to $run_influxdb_dest"
+  sudo mkdir -p "$dest_dir"
+  sudo cp "$run_influxdb_src" "$run_influxdb_dest"
+}
+
+function install_influxdb_commons {
+  local -r src_dir="$1"
+  local -r dest_dir="$2"
+
+  log_info "Copying $src_dir to $dest_dir"
+  sudo cp -r "$src_dir" "$dest_dir"
 }
 
 function install_influxdb {
@@ -120,6 +148,9 @@ function install_influxdb {
   # Disable the installed systemd services to prevent them from starting up on boot
   sudo systemctl disable influxdb-meta.service
   sudo systemctl disable influxdb.service
+
+  install_influxdb_scripts "$DEFAULT_INFLUXDB_BIN_DIR"
+  install_influxdb_commons "$INFLUXDB_COMMONS_SRC_DIR" "$INFLUXDB_COMMONS_INSTALL_DIR"
 }
 
 install_influxdb "$@"
