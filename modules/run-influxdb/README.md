@@ -45,6 +45,7 @@ This script can be used to configure and initialize InfluxDB. This script has be
 
 Options:
 
+  --hostname         The hostname of the current node.
   --node-type        Specifies whether the instance will be a Meta or Data node. Must be one of 'meta' or 'data'.
   --meta-asg-name    The name of the ASG that contains meta nodes.
   --data-asg-name    The name of the ASG that contains data nodes.

@@ -1,0 +1,89 @@
+# ---------------------------------------------------------------------------------------------------------------------
+# REQUIRED PARAMETERS
+# You must provide a value for each of these parameters.
+# ---------------------------------------------------------------------------------------------------------------------
+
+variable "target_group_name" {
+  description = "The name to use for the Target Group"
+}
+
+variable "asg_name" {
+  description = "The name of the ASG (ASG) in the servers are deployed"
+}
+
+variable "port" {
+  description = "The port the servers are listening on for requests."
+}
+
+variable "listener_arns" {
+  description = "The ARNs of ALB listeners to which Listener Rules that route to this Target Group should be added."
+  type        = "list"
+}
+
+variable "listener_arns_num" {
+  description = "The number of ARNs in var.listener_arns. We should be able to compute this automatically, but due to a Terraform limitation, if there are any dynamic resources in var.listener_arns, then we won't be able to: https://github.com/hashicorp/terraform/pull/11482"
+}
+
+variable "listener_rule_starting_priority" {
+  description = "The starting priority for the Listener Rules"
+}
+
+variable "health_check_path" {
+  description = "The path to use for health check requests."
+}
+
+variable "vpc_id" {
+  description = "The ID of the VPC in which to deploy the Target Group"
+}
+
+# ---------------------------------------------------------------------------------------------------------------------
+# OPTIONAL PARAMETERS
+# These parameters have reasonable defaults.
+# ---------------------------------------------------------------------------------------------------------------------
+
+variable "routing_condition" {
+  description = "This variable defines the paths or domain names that will be routed to the servers. By default, we route all paths and domain names to the servers. To override this, you should pass in a list of maps, where each map has the keys field and values. See the Condition Blocks documentation for the syntax to use: https://www.terraform.io/docs/providers/aws/r/lb_listener_rule.html."
+  type        = "list"
+
+  default = [
+    {
+      field  = "path-pattern"
+      values = ["*"]
+    },
+  ]
+}
+
+variable "protocol" {
+  description = "The protocol to use to talk to the servers. Must be one of: HTTP, HTTPS."
+  default     = "HTTP"
+}
+
+variable "deregistration_delay" {
+  description = "The amount time for the Load Balancer to wait before changing the state of a deregistering server from draining to unused. The range is 0-3600 seconds."
+  default     = 300
+}
+
+variable "health_check_interval" {
+  description = "The approximate amount of time, in seconds, between health checks of each server. Minimum value 5 seconds, Maximum value 300 seconds."
+  default     = 30
+}
+
+variable "health_check_timeout" {
+  description = "The amount of time, in seconds, during which no response from a server means a failed health check. Must be between 2 and 60 seconds."
+  default     = 5
+}
+
+variable "health_check_healthy_threshold" {
+  description = "The number of times the health check must pass before a server is considered healthy."
+  default     = 2
+}
+
+variable "health_check_unhealthy_threshold" {
+  description = "The number of times the health check must fail before a server is considered unhealthy."
+  default     = 2
+}
+
+variable "health_check_matcher" {
+  description = "The HTTP codes to use when checking for a successful response from a server. You can specify multiple comma-separated values (for example, \"200,202\") or a range of values (for example, \"200-299\")."
+  default     = "200"
+}

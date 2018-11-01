@@ -35,6 +35,7 @@ function run {
   local -r hh_dir="$volume_mount_point/var/lib/influxdb/hh"
 
   "/opt/influxdb/bin/run-influxdb" \
+    --hostname "$hostname" \
     --node-type "meta" \
     --meta-asg-name "$asg_name" \
     --data-asg-name "$asg_name" \
@@ -44,6 +45,7 @@ function run {
     --auto-fill "<__META_DIR__>=$meta_dir"
 
   "/opt/influxdb/bin/run-influxdb" \
+    --hostname "$hostname" \
     --node-type "data" \
     --meta-asg-name "$asg_name" \
     --data-asg-name "$asg_name" \
