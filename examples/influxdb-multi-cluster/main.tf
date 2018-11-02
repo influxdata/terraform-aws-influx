@@ -180,6 +180,7 @@ module "influxdb_meta_nodes_security_group_rules" {
 
   raft_port = 8089
   rest_port = 8091
+  tcp_port  = 8088
   api_port  = ""
 
   # To keep this example simple, we allow these ports to be accessed from any IP. In a production
@@ -187,6 +188,7 @@ module "influxdb_meta_nodes_security_group_rules" {
   raft_port_cidr_blocks = ["0.0.0.0/0"]
 
   rest_port_cidr_blocks = ["0.0.0.0/0"]
+  tcp_port_cidr_blocks  = ["0.0.0.0/0"]
 }
 
 module "influxdb_data_nodes_security_group_rules" {
@@ -199,6 +201,7 @@ module "influxdb_data_nodes_security_group_rules" {
 
   raft_port = 8088
   rest_port = 8091
+  tcp_port  = 8089
   api_port  = 8086
 
   # To keep this example simple, we allow these ports to be accessed from any IP. In a production
@@ -206,6 +209,7 @@ module "influxdb_data_nodes_security_group_rules" {
   raft_port_cidr_blocks = ["0.0.0.0/0"]
 
   rest_port_cidr_blocks = ["0.0.0.0/0"]
+  tcp_port_cidr_blocks  = ["0.0.0.0/0"]
   api_port_cidr_blocks  = ["0.0.0.0/0"]
 }
 
