@@ -2,6 +2,7 @@
 
 set -e
 
+source "/opt/influxdb-commons/influxdb-common.sh"
 source "/opt/influxdb-commons/mount-volume.sh"
 
 function mount_volumes {
@@ -22,7 +23,7 @@ function run {
   local -r data_volume_device_name="$6"
   local -r data_volume_mount_point="$7"
   local -r volume_owner="$8"
-  local -r hostname="$(curl http://169.254.169.254/latest/meta-data/hostname)"
+  local -r hostname=$(get_node_hostname)
 
   mount_volumes "$data_volume_device_name" "$data_volume_mount_point" "$volume_owner"
 

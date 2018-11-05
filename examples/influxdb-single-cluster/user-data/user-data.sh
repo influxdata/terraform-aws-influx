@@ -6,6 +6,7 @@ set -e
 # From: https://alestic.com/2010/12/ec2-user-data-output/
 exec > >(tee /user-data/mock-user-data.log|logger -t user-data -s 2>/dev/console) 2>&1
 
+source "/opt/influxdb-commons/influxdb-common.sh"
 source "/opt/influxdb-commons/mount-volume.sh"
 
 function mount_volumes {
@@ -25,7 +26,7 @@ function run {
   local -r volume_device_name="$5"
   local -r volume_mount_point="$6"
   local -r volume_owner="$7"
-  local -r hostname="$(curl http://169.254.169.254/latest/meta-data/hostname)"
+  local -r hostname=$(get_node_hostname)
 
   mount_volumes "$volume_device_name" "$volume_mount_point" "$volume_owner"
 
