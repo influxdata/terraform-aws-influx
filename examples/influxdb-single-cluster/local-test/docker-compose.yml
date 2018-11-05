@@ -1,0 +1,49 @@
+# This file can be used with Docker and Docker Compose to run this InfluxDB example locally. This is solely meant to
+# make testing and iterating faster and easier. See examples/local-mocks for instructions.
+
+version: '3'
+services:
+  influxdb-0: &influxdb_config
+    image: gruntwork/influxdb-${OS_NAME}
+    entrypoint: ["/entrypoint/entrypoint.sh"]
+    container_name: ${CONTAINER_BASE_NAME}-0
+
+    # Required to make systemd happy
+    privileged: true
+
+    volumes:
+      # Used for systemd
+      - /sys/fs/cgroup:/sys/fs/cgroup:ro
+
+      # Mount these scripts so we get hot reload
+      - ../../../modules/run-influxdb/run-influxdb:/opt/influxdb/bin/run-influxdb
+      - ../../../modules/influxdb-commons:/opt/influxdb-commons
+
+      # Override scripts with mocks so we can run locally, without talking to AWS APIs
+      - ../../local-mocks/aws.sh:/opt/gruntwork/bash-commons/aws.sh
+      - ../../local-mocks/mount-volume.sh:/opt/influxdb-commons/mount-volume.sh
+      - ../../local-mocks/influxdb-common.sh:/opt/influxdb-commons/influxdb-common.sh
+
+      # Mount the scripts we use to run InfluxDB during Docker container boot
+      - ../user-data:/user-data
+      - ../../local-mocks/entrypoint.sh:/entrypoint/entrypoint.sh
+
+    environment:
+      # The User Data script that will be executed on boot by entrypoint.sh
+      USER_DATA_SCRIPT: /user-data/user-data.sh
+
+      # Any environment variable starting with USER_DATA_ENV_ will be read in by entrypoint.sh and made available in
+      # the User Data script, with the USER_DATA_ENV_ portion stripped off.
+      USER_DATA_ENV_cluster_asg_name: mock-influxdb-asg
+      USER_DATA_ENV_cluster_size: 1
+      USER_DATA_ENV_aws_region: us-east-1
+      USER_DATA_ENV_license_key: ${LICENSE_KEY}
+      USER_DATA_ENV_shared_secret: ${SHARED_SECRET}
+      USER_DATA_ENV_data_node_container_base_name: ${CONTAINER_BASE_NAME}
+      USER_DATA_ENV_volume_device_name: /dev/xvdf
+      USER_DATA_ENV_volume_mount_point: /influxdb
+      USER_DATA_ENV_volume_owner: influxdb
+    
+    ports:
+      # Map these ports to any available port number on the host
+      - "8086:8086"
