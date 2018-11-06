@@ -6,6 +6,8 @@ import (
 	"testing"
 	"time"
 
+	"github.com/gruntwork-io/terratest/modules/retry"
+
 	"github.com/gruntwork-io/terratest/modules/packer"
 	client "github.com/influxdata/influxdb/client/v2"
 )
@@ -44,18 +46,27 @@ func validateInfluxdb(t *testing.T, endpoint string, port string) {
 
 	defer c.Close()
 
+	maxRetries := 10
+	sleepBetweenRetries := 5 * time.Second
+
 	// Create database
-	response, err := c.Query(client.Query{
-		Command: fmt.Sprintf("CREATE DATABASE %s", databaseName),
+	retry.DoWithRetry(t, "Querying database", maxRetries, sleepBetweenRetries, func() (string, error) {
+		response, err := c.Query(client.Query{
+			Command: fmt.Sprintf("CREATE DATABASE %s", databaseName),
+		})
+
+		if err != nil {
+			t.Logf("Query failed: %s", err.Error())
+			return "", err
+		}
+
+		if response.Error() != nil {
+			t.Logf("Query failed: %s", response.Error().Error())
+			return "", response.Error()
+		}
+
+		return "", nil
 	})
-
-	if err != nil {
-		t.Fatalf("Query failed: %s", err.Error())
-	}
-
-	if response.Error() != nil {
-		t.Fatalf("Query failed: %s", response.Error().Error())
-	}
 
 	// Write to database
 	branchPoints, err := client.NewBatchPoints(client.BatchPointsConfig{
@@ -86,10 +97,14 @@ func validateInfluxdb(t *testing.T, endpoint string, port string) {
 	}
 
 	// Read from database
-	response, _ = c.Query(client.Query{
+	response, err := c.Query(client.Query{
 		Command:  fmt.Sprintf("SELECT * FROM %s", metric),
 		Database: databaseName,
 	})
+
+	if err != nil {
+		t.Fatal("Unable to read from database")
+	}
 
 	if response.Error() != nil {
 		t.Fatalf("Query failed: %s", response.Error().Error())
