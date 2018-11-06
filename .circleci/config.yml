@@ -16,7 +16,7 @@ jobs:
           command: |
             sudo apt-get -y update
             curl -Ls https://raw.githubusercontent.com/gruntwork-io/gruntwork-installer/master/bootstrap-gruntwork-installer.sh | bash /dev/stdin --version v0.0.21
-            gruntwork-install --module-name "gruntwork-module-circleci-helpers" --repo "https://github.com/gruntwork-io/module-ci" --tag "v0.13.3"
+            gruntwork-install --module-name "gruntwork-module-circleci-helpers" --repo "https://github.com/gruntwork-io/module-ci" --tag "v0.7.2"
             configure-environment-for-gruntwork-module --circle-ci-2 --use-go-dep --go-src-path test
 
       - run:
