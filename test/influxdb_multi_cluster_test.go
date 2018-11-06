@@ -5,6 +5,7 @@ import (
 	"os"
 	"strings"
 	"testing"
+	"time"
 
 	"github.com/gruntwork-io/terratest/modules/aws"
 	"github.com/gruntwork-io/terratest/modules/random"
@@ -24,24 +25,24 @@ func TestInfluxDBMultiCluster(t *testing.T) {
 	// os.Setenv("SKIP_validate", "true")
 	// os.Setenv("SKIP_teardown", "true")
 
-	examplesDir := test_structure.CopyTerraformFolderToTemp(t, "..", "/examples")
-	amiDir := fmt.Sprintf("%s/influxdb-ami", examplesDir)
-
 	var testcases = []struct {
-		testName   string
-		packerInfo PackerInfo
+		testName      string
+		packerInfo    PackerInfo
+		sleepDuration int
 	}{
 		{
 			"TestInfluxDBMultiClusterUbuntu",
 			PackerInfo{
 				builderName:  "influxdb-ami-ubuntu",
-				templatePath: fmt.Sprintf("%s/influxdb.json", amiDir)},
+				templatePath: "influxdb.json"},
+			0,
 		},
 		{
 			"TestInfluxDBMultiClusterAmazonLinux",
 			PackerInfo{
 				builderName:  "influxdb-ami-amazon-linux",
-				templatePath: fmt.Sprintf("%s/influxdb.json", amiDir)},
+				templatePath: "influxdb.json"},
+			3,
 		},
 	}
 
@@ -53,6 +54,14 @@ func TestInfluxDBMultiCluster(t *testing.T) {
 		t.Run(testCase.testName, func(t *testing.T) {
 			t.Parallel()
 
+			// This is terrible - but attempt to stagger the test cases to
+			// avoid a concurrency issue
+			time.Sleep(time.Duration(testCase.sleepDuration) * time.Second)
+
+			examplesDir := test_structure.CopyTerraformFolderToTemp(t, "..", "/examples")
+			amiDir := fmt.Sprintf("%s/influxdb-ami", examplesDir)
+			templatePath := fmt.Sprintf("%s/%s", amiDir, testCase.packerInfo.templatePath)
+
 			awsRegion := aws.GetRandomRegion(t, nil, nil)
 
 			defer test_structure.RunTestStage(t, "teardown", func() {
@@ -61,7 +70,7 @@ func TestInfluxDBMultiCluster(t *testing.T) {
 			})
 
 			test_structure.RunTestStage(t, "setup_ami", func() {
-				amiID := buildAmi(t, testCase.packerInfo.templatePath, testCase.packerInfo.builderName, awsRegion)
+				amiID := buildAmi(t, templatePath, testCase.packerInfo.builderName, awsRegion)
 
 				uniqueID := strings.ToLower(random.UniqueId())
 				metaClusterName := fmt.Sprintf("influxdb-meta-%s", uniqueID)

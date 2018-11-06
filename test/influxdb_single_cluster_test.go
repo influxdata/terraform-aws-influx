@@ -5,6 +5,7 @@ import (
 	"os"
 	"strings"
 	"testing"
+	"time"
 
 	"github.com/gruntwork-io/terratest/modules/aws"
 	"github.com/gruntwork-io/terratest/modules/random"
@@ -24,25 +25,24 @@ func TestInfluxDBSingleCluster(t *testing.T) {
 	// os.Setenv("SKIP_validate", "true")
 	// os.Setenv("SKIP_teardown", "true")
 
-	rootDir := test_structure.CopyTerraformFolderToTemp(t, "..", "/")
-	examplesDir := fmt.Sprintf("%s/examples", rootDir)
-	amiDir := fmt.Sprintf("%s/influxdb-ami", examplesDir)
-
 	var testcases = []struct {
-		testName   string
-		packerInfo PackerInfo
+		testName      string
+		packerInfo    PackerInfo
+		sleepDuration int
 	}{
 		{
 			"TestInfluxDBSingleClusterUbuntu",
 			PackerInfo{
 				builderName:  "influxdb-ami-ubuntu",
-				templatePath: fmt.Sprintf("%s/influxdb.json", amiDir)},
+				templatePath: "influxdb.json"},
+			0,
 		},
 		{
 			"TestInfluxDBSingleClusterAmazonLinux",
 			PackerInfo{
 				builderName:  "influxdb-ami-amazon-linux",
-				templatePath: fmt.Sprintf("%s/influxdb.json", amiDir)},
+				templatePath: "influxdb.json"},
+			3,
 		},
 	}
 
@@ -54,6 +54,15 @@ func TestInfluxDBSingleCluster(t *testing.T) {
 		t.Run(testCase.testName, func(t *testing.T) {
 			t.Parallel()
 
+			// This is terrible - but attempt to stagger the test cases to
+			// avoid a concurrency issue
+			time.Sleep(time.Duration(testCase.sleepDuration) * time.Second)
+
+			rootDir := test_structure.CopyTerraformFolderToTemp(t, "..", "/")
+			examplesDir := fmt.Sprintf("%s/examples", rootDir)
+			amiDir := fmt.Sprintf("%s/influxdb-ami", examplesDir)
+			templatePath := fmt.Sprintf("%s/%s", amiDir, testCase.packerInfo.templatePath)
+
 			awsRegion := aws.GetRandomRegion(t, nil, nil)
 
 			defer test_structure.RunTestStage(t, "teardown", func() {
@@ -62,7 +71,7 @@ func TestInfluxDBSingleCluster(t *testing.T) {
 			})
 
 			test_structure.RunTestStage(t, "setup_ami", func() {
-				amiID := buildAmi(t, testCase.packerInfo.templatePath, testCase.packerInfo.builderName, awsRegion)
+				amiID := buildAmi(t, templatePath, testCase.packerInfo.builderName, awsRegion)
 
 				uniqueID := strings.ToLower(random.UniqueId())
 				clusterName := fmt.Sprintf("influxdb-%s", uniqueID)
@@ -72,7 +81,7 @@ func TestInfluxDBSingleCluster(t *testing.T) {
 
 				terraformOptions := &terraform.Options{
 					// The path to where your Terraform code is located
-					TerraformDir: fmt.Sprintf("%s", rootDir),
+					TerraformDir: rootDir,
 					Vars: map[string]interface{}{
 						"aws_region":            awsRegion,
 						"ami_id":                amiID,
