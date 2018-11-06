@@ -46,7 +46,7 @@ func validateInfluxdb(t *testing.T, endpoint string, port string) {
 
 	defer c.Close()
 
-	maxRetries := 10
+	maxRetries := 15
 	sleepBetweenRetries := 5 * time.Second
 
 	// Create database
