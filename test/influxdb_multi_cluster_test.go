@@ -12,7 +12,7 @@ import (
 	"github.com/gruntwork-io/terratest/modules/test-structure"
 )
 
-func TestInfluxDBSingleCluster(t *testing.T) {
+func TestInfluxDBMultiCluster(t *testing.T) {
 	t.Parallel()
 
 	// For convenience - uncomment these as well as the "os" import
@@ -24,8 +24,7 @@ func TestInfluxDBSingleCluster(t *testing.T) {
 	// os.Setenv("SKIP_validate", "true")
 	// os.Setenv("SKIP_teardown", "true")
 
-	rootDir := test_structure.CopyTerraformFolderToTemp(t, "..", "/")
-	examplesDir := fmt.Sprintf("%s/examples", rootDir)
+	examplesDir := test_structure.CopyTerraformFolderToTemp(t, "..", "/examples")
 	amiDir := fmt.Sprintf("%s/influxdb-ami", examplesDir)
 
 	var testcases = []struct {
@@ -33,13 +32,13 @@ func TestInfluxDBSingleCluster(t *testing.T) {
 		packerInfo PackerInfo
 	}{
 		{
-			"TestInfluxDBSingleClusterUbuntu",
+			"TestInfluxDBMultiClusterUbuntu",
 			PackerInfo{
 				builderName:  "influxdb-ami-ubuntu",
 				templatePath: fmt.Sprintf("%s/influxdb.json", amiDir)},
 		},
 		{
-			"TestInfluxDBSingleClusterAmazonLinux",
+			"TestInfluxDBMultiClusterAmazonLinux",
 			PackerInfo{
 				builderName:  "influxdb-ami-amazon-linux",
 				templatePath: fmt.Sprintf("%s/influxdb.json", amiDir)},
@@ -65,21 +64,23 @@ func TestInfluxDBSingleCluster(t *testing.T) {
 				amiID := buildAmi(t, testCase.packerInfo.templatePath, testCase.packerInfo.builderName, awsRegion)
 
 				uniqueID := strings.ToLower(random.UniqueId())
-				clusterName := fmt.Sprintf("influxdb-%s", uniqueID)
+				metaClusterName := fmt.Sprintf("influxdb-meta-%s", uniqueID)
+				dataClusterName := fmt.Sprintf("influxdb-data-%s", uniqueID)
 
 				keyPair := aws.CreateAndImportEC2KeyPair(t, awsRegion, uniqueID)
 				test_structure.SaveEc2KeyPair(t, examplesDir, keyPair)
 
 				terraformOptions := &terraform.Options{
 					// The path to where your Terraform code is located
-					TerraformDir: fmt.Sprintf("%s", rootDir),
+					TerraformDir: fmt.Sprintf("%s/influxdb-multi-cluster", examplesDir),
 					Vars: map[string]interface{}{
-						"aws_region":            awsRegion,
-						"ami_id":                amiID,
-						"ssh_key_name":          keyPair.Name,
-						"influxdb_cluster_name": clusterName,
-						"license_key":           os.Getenv("LICENSE_KEY"),
-						"shared_secret":         os.Getenv("SHARED_SECRET"),
+						"aws_region":                       awsRegion,
+						"ami_id":                           amiID,
+						"ssh_key_name":                     keyPair.Name,
+						"influxdb_meta_nodes_cluster_name": metaClusterName,
+						"influxdb_data_nodes_cluster_name": dataClusterName,
+						"license_key":                      os.Getenv("LICENSE_KEY"),
+						"shared_secret":                    os.Getenv("SHARED_SECRET"),
 					},
 				}
 
