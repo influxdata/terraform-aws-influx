@@ -137,6 +137,7 @@ data "template_file" "user_data_influxdb_meta_nodes" {
     data_cluster_asg_name = "${var.influxdb_data_nodes_cluster_name}"
     aws_region            = "${var.aws_region}"
     license_key           = "${var.license_key}"
+    shared_secret         = "${var.shared_secret}"
 
     # Pass in the data about the EBS volumes so they can be mounted
     meta_volume_device_name = "${var.meta_volume_device_name}"

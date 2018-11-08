@@ -43,6 +43,7 @@ function run {
     --region "$aws_region" \
     --auto-fill "<__HOST_NAME__>=$hostname" \
     --auto-fill "<__LICENSE_KEY__>=$license_key" \
+    --auto-fill "<__SHARED_SECRET__>=$shared_secret" \
     --auto-fill "<__META_DIR__>=$meta_dir"
 
   "/opt/influxdb/bin/run-influxdb" \
