@@ -7,6 +7,5 @@
 set -e
 
 function get_node_hostname {
-  local -r hostname="$(hostname)"
-  echo -n "$hostname"
+  echo -n "$(hostname)"
 }
