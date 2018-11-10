@@ -182,7 +182,6 @@ module "influxdb_meta_nodes_security_group_rules" {
   raft_port = 8089
   rest_port = 8091
   tcp_port  = 8088
-  api_port  = ""
 
   # To keep this example simple, we allow these ports to be accessed from any IP. In a production
   # deployment, you may want to lock these down just to trusted servers.
@@ -203,7 +202,7 @@ module "influxdb_data_nodes_security_group_rules" {
   raft_port = 8088
   rest_port = 8091
   tcp_port  = 8089
-  api_port  = 8086
+  api_port  = "${var.api_port}"
 
   # To keep this example simple, we allow these ports to be accessed from any IP. In a production
   # deployment, you may want to lock these down just to trusted servers.
@@ -251,7 +250,7 @@ module "load_balancer" {
   vpc_id     = "${data.aws_vpc.default.id}"
   subnet_ids = "${data.aws_subnet_ids.default.ids}"
 
-  http_listener_ports = [8086]
+  http_listener_ports = ["${var.api_port}"]
 
   # To make testing easier, we allow inbound connections from any IP. In production usage, you may want to only allow
   # connectsion from certain trusted servers, or even use an internal load balancer, so it's only accessible from
@@ -274,7 +273,7 @@ module "influxdb_data_nodes_target_group" {
   health_check_matcher = "204"
   vpc_id               = "${data.aws_vpc.default.id}"
 
-  listener_arns                   = ["${lookup(module.load_balancer.http_listener_arns, 8086)}"]
+  listener_arns                   = ["${lookup(module.load_balancer.http_listener_arns, var.api_port)}"]
   listener_arns_num               = 1
   listener_rule_starting_priority = 100
 }

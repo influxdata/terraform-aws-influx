@@ -32,6 +32,11 @@ variable "shared_secret" {
 # These parameters have reasonable defaults.
 # ---------------------------------------------------------------------------------------------------------------------
 
+variable "api_port" {
+  description = "The HTTP API port the Data nodes listen on for external communication."
+  default     = "8086"
+}
+
 variable "influxdb_meta_nodes_cluster_name" {
   description = "What to name the InfluxDB meta nodes cluster and all of its associated resources"
   default     = "influxdb-cluster-meta"

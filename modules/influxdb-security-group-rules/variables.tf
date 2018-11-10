@@ -19,14 +19,15 @@ variable "tcp_port" {
   description = "The port the Meta/Data nodes use for internal communication via a TCP protocol."
 }
 
-variable "api_port" {
-  description = "The HTTP API port the Data nodes listen on for external communication."
-}
-
 # ---------------------------------------------------------------------------------------------------------------------
 # OPTIONAL PARAMETERS
 # These parameters have reasonable defaults.
 # ---------------------------------------------------------------------------------------------------------------------
+
+variable "api_port" {
+  description = "The HTTP API port the Data nodes listen on for external communication."
+  default     = ""
+}
 
 variable "raft_port_cidr_blocks" {
   description = "The list of IP address ranges in CIDR notation from which to allow connections to the raft_port."
