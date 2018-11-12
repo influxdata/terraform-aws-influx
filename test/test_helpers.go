@@ -40,8 +40,7 @@ func validateInfluxdb(t *testing.T, endpoint string, port string) {
 	timestamp := time.Now()
 
 	c, err := client.NewHTTPClient(client.HTTPConfig{
-		Addr:    fmt.Sprintf("http://%s:%s", endpoint, port),
-		Timeout: time.Second * 60,
+		Addr: fmt.Sprintf("http://%s:%s", endpoint, port),
 	})
 
 	require.NoError(t, err, "Unable to connect to InfluxDB endpoint")
