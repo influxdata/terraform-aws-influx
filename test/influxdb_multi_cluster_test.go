@@ -62,14 +62,13 @@ func TestInfluxDBMultiCluster(t *testing.T) {
 			amiDir := fmt.Sprintf("%s/influxdb-ami", examplesDir)
 			templatePath := fmt.Sprintf("%s/%s", amiDir, testCase.packerInfo.templatePath)
 
-			awsRegion := aws.GetRandomRegion(t, nil, nil)
-
 			defer test_structure.RunTestStage(t, "teardown", func() {
 				terraformOptions := test_structure.LoadTerraformOptions(t, examplesDir)
 				terraform.Destroy(t, terraformOptions)
 			})
 
 			test_structure.RunTestStage(t, "setup_ami", func() {
+				awsRegion := aws.GetRandomRegion(t, nil, nil)
 				amiID := buildAmi(t, templatePath, testCase.packerInfo.builderName, awsRegion)
 
 				uniqueID := strings.ToLower(random.UniqueId())

@@ -6,10 +6,13 @@ import (
 	"testing"
 	"time"
 
+	"github.com/gruntwork-io/terratest/modules/logger"
 	"github.com/gruntwork-io/terratest/modules/retry"
 
 	"github.com/gruntwork-io/terratest/modules/packer"
 	client "github.com/influxdata/influxdb/client/v2"
+	"github.com/stretchr/testify/assert"
+	"github.com/stretchr/testify/require"
 )
 
 type PackerInfo struct {
@@ -37,12 +40,11 @@ func validateInfluxdb(t *testing.T, endpoint string, port string) {
 	timestamp := time.Now()
 
 	c, err := client.NewHTTPClient(client.HTTPConfig{
-		Addr: fmt.Sprintf("http://%s:%s", endpoint, port),
+		Addr:    fmt.Sprintf("http://%s:%s", endpoint, port),
+		Timeout: time.Second * 60,
 	})
 
-	if err != nil {
-		t.Fatal("Unable to connect to InfluxDB endpoint")
-	}
+	require.NoError(t, err, "Unable to connect to InfluxDB endpoint")
 
 	defer c.Close()
 
@@ -55,13 +57,10 @@ func validateInfluxdb(t *testing.T, endpoint string, port string) {
 			Command: fmt.Sprintf("CREATE DATABASE %s", databaseName),
 		})
 
-		if err != nil {
-			t.Logf("Query failed: %s", err.Error())
-			return "", err
-		}
+		require.NoError(t, err, "Query failed")
 
 		if response.Error() != nil {
-			t.Logf("Query failed: %s", response.Error().Error())
+			logger.Logf(t, "Query failed: %s", response.Error().Error())
 			return "", response.Error()
 		}
 
@@ -74,9 +73,7 @@ func validateInfluxdb(t *testing.T, endpoint string, port string) {
 		Precision: "s",
 	})
 
-	if err != nil {
-		t.Fatal("Unable to create branch points")
-	}
+	require.NoError(t, err, "Unable to create branch points")
 
 	point, err := client.NewPoint(
 		metric,
@@ -85,16 +82,11 @@ func validateInfluxdb(t *testing.T, endpoint string, port string) {
 		timestamp,
 	)
 
-	if err != nil {
-		t.Fatal("Unable to create a point")
-	}
+	require.NoError(t, err, "Unable to create a point")
 
 	branchPoints.AddPoint(point)
 	err = c.Write(branchPoints)
-
-	if err != nil {
-		t.Fatal("Unable to write to database")
-	}
+	require.NoError(t, err, "Unable to write to database")
 
 	// Read from database
 	response, err := c.Query(client.Query{
@@ -102,22 +94,17 @@ func validateInfluxdb(t *testing.T, endpoint string, port string) {
 		Database: databaseName,
 	})
 
-	if err != nil {
-		t.Fatal("Unable to read from database")
-	}
+	require.NoError(t, err, "Unable to read from database")
+	require.NoError(t, response.Error(), "Query failed")
 
-	if response.Error() != nil {
-		t.Fatalf("Query failed: %s", response.Error().Error())
-	}
-
-	if len(response.Results) != 1 {
-		t.Fatal("Was only expecting one result object")
-	}
+	assert.Len(t, response.Results, 1)
 
 	// Verify returned result
 	series := response.Results[0].Series[0]
+
+	assert.Equal(t, metric, series.Name)
+	assert.Equal(t, city, series.Values[0][1])
+
 	returnedValue, _ := series.Values[0][2].(json.Number).Int64()
-	if series.Name != metric || series.Values[0][1] != city || returnedValue != value {
-		t.Fatal("Incorrect entry retrieved")
-	}
+	assert.Equal(t, value, returnedValue)
 }
