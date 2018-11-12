@@ -74,6 +74,23 @@ The `run-influxdb` script can automatically pick a rally point automatically by:
 1. Pick the meta node with the oldest Launch Time as the rally point. If multiple nodes have identical launch times, use the
    one with the earliest Instance ID, alphabetically.
 
+## Passing credentials securely
+
+The `run-influxdb` script requires that you pass in your license key and shared secret. You should make sure to never 
+store these credentials in plaintext! You should use a secrets management tool to store the credentials in an encrypted
+format and only decrypt them, in memory, just before calling `run-influxdb`. Here are some tools to consider:
+
+* [Vault](https://www.vaultproject.io/)
+* [Keywhiz](https://square.github.io/keywhiz/)
+* [KMS](https://aws.amazon.com/kms/)
+
+Moreover, if you're ever calling `run-influxdb` interactively (i.e., you're manually running CLI commands
+rather than executing a script), be careful of passing credentials directly on the command line, or they will be 
+stored, in plaintext, [in Bash 
+history](https://www.digitalocean.com/community/tutorials/how-to-use-bash-history-commands-and-expansions-on-a-linux-vps)!
+You can either use a CLI tool to set the credentials as environment variables or you can [temporarily disable Bash
+history](https://linuxconfig.org/how-to-disable-bash-shell-commands-history-on-linux). 
+
 ## Required permissions
 
 The `run-influxdb` script assumes it is running on an EC2 Instance with an [IAM 

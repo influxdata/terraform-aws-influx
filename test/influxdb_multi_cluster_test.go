@@ -7,6 +7,8 @@ import (
 	"testing"
 	"time"
 
+	"github.com/stretchr/testify/require"
+
 	"github.com/gruntwork-io/terratest/modules/aws"
 	"github.com/gruntwork-io/terratest/modules/random"
 	"github.com/gruntwork-io/terratest/modules/terraform"
@@ -78,6 +80,12 @@ func TestInfluxDBMultiCluster(t *testing.T) {
 				keyPair := aws.CreateAndImportEC2KeyPair(t, awsRegion, uniqueID)
 				test_structure.SaveEc2KeyPair(t, examplesDir, keyPair)
 
+				licenseKey := os.Getenv("LICENSE_KEY")
+				sharedSecret := os.Getenv("SHARED_SECRET")
+
+				require.NotEmpty(t, licenseKey, "License key must be set as an env var and not included as plain-text")
+				require.NotEmpty(t, sharedSecret, "Shared secret must be set as an env var and not included as plain-text")
+
 				terraformOptions := &terraform.Options{
 					// The path to where your Terraform code is located
 					TerraformDir: fmt.Sprintf("%s/influxdb-multi-cluster", examplesDir),
@@ -87,8 +95,8 @@ func TestInfluxDBMultiCluster(t *testing.T) {
 						"ssh_key_name":                     keyPair.Name,
 						"influxdb_meta_nodes_cluster_name": metaClusterName,
 						"influxdb_data_nodes_cluster_name": dataClusterName,
-						"license_key":                      os.Getenv("LICENSE_KEY"),
-						"shared_secret":                    os.Getenv("SHARED_SECRET"),
+						"license_key":                      licenseKey,
+						"shared_secret":                    sharedSecret,
 					},
 				}
 

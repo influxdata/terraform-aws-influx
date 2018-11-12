@@ -11,6 +11,7 @@ import (
 	"github.com/gruntwork-io/terratest/modules/random"
 	"github.com/gruntwork-io/terratest/modules/terraform"
 	"github.com/gruntwork-io/terratest/modules/test-structure"
+	"github.com/stretchr/testify/require"
 )
 
 func TestInfluxDBSingleCluster(t *testing.T) {
@@ -78,6 +79,12 @@ func TestInfluxDBSingleCluster(t *testing.T) {
 				keyPair := aws.CreateAndImportEC2KeyPair(t, awsRegion, uniqueID)
 				test_structure.SaveEc2KeyPair(t, examplesDir, keyPair)
 
+				licenseKey := os.Getenv("LICENSE_KEY")
+				sharedSecret := os.Getenv("SHARED_SECRET")
+
+				require.NotEmpty(t, licenseKey, "License key must be set as an env var and not included as plain-text")
+				require.NotEmpty(t, sharedSecret, "Shared secret must be set as an env var and not included as plain-text")
+
 				terraformOptions := &terraform.Options{
 					// The path to where your Terraform code is located
 					TerraformDir: rootDir,
@@ -86,8 +93,8 @@ func TestInfluxDBSingleCluster(t *testing.T) {
 						"ami_id":                amiID,
 						"ssh_key_name":          keyPair.Name,
 						"influxdb_cluster_name": clusterName,
-						"license_key":           os.Getenv("LICENSE_KEY"),
-						"shared_secret":         os.Getenv("SHARED_SECRET"),
+						"license_key":           licenseKey,
+						"shared_secret":         sharedSecret,
 					},
 				}
 

@@ -20,11 +20,11 @@ variable "ami_id" {
 }
 
 variable "license_key" {
-  description = "The key of your InfluxDB Enterprise license."
+  description = "The key of your InfluxDB Enterprise license. This should not be set in plain-text and can be passed in as an env var or from a secrets management tool."
 }
 
 variable "shared_secret" {
-  description = "A long pass phrase that will be used to sign tokens for intra-cluster communication on data nodes."
+  description = "A long pass phrase that will be used to sign tokens for intra-cluster communication on data nodes. This should not be set in plain-text and can be passed in as an env var or from a secrets management tool."
 }
 
 # ---------------------------------------------------------------------------------------------------------------------
