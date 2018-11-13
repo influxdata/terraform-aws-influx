@@ -170,19 +170,46 @@ function wait_for_node_to_join_cluster {
 function start_influxdb {
   local -r node_type="$1"
 
+  set +e
+
   if [[ "$node_type" == "meta" ]]; then
     log_info "Starting InfluxDB Meta Service"
     sudo systemctl enable influxdb-meta.service
     sudo systemctl start influxdb-meta.service
+    echo -n "$?"
   else
     log_info "Starting InfluxDB Data Service"
     sudo systemctl enable influxdb.service
     sudo systemctl start influxdb.service
+    echo -n "$?"
   fi
 
-  # The services need a few seconds to fully initialize
-  # before we start hitting them with cluster operation requests
-  sleep 5
+  set -e
+}
+
+function wait_for_service_to_start {
+  local -r node_type="$1"
+  local -r max_retries=5
+  local -r sleep_between_retries=5
+
+  for (( i=0; i<"$max_retries"; i++ )); do
+    local exit_code
+    exit_code=$(start_influxdb "$node_type")
+
+    if [[ "$exit_code" == "0" ]]; then
+      log_info "Service started successfully."
+      # The services need a few seconds to fully initialize
+      # before we start hitting them with cluster operation requests
+      sleep 5
+      return
+    else
+      log_warn "Service couldn't start. Will sleep for $sleep_between_retries seconds and try again."
+      sleep "$sleep_between_retries"
+    fi
+  done
+
+  log_error "Service failed to start after $max_retries retries."
+  exit 1
 }
 
 function run_influxdb {
@@ -254,7 +281,7 @@ function run_influxdb {
   fi
 
   discover_all_nodes "$meta_asg_name" "$data_asg_name" "$region"
-  start_influxdb "$node_type"
+  wait_for_service_to_start "$node_type"
 
   local rally_point_hostname
   rally_point_hostname=$(get_rally_point_hostname "$meta_asg_name" "$region")
