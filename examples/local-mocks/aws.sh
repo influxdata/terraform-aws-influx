@@ -27,7 +27,7 @@ function aws_get_instance_public_hostname {
 
 function aws_get_instance_region {
   # This variable is set in docker-compose.yml
-  echo "$mock_aws_region"
+  echo "$aws_region"
 }
 
 function aws_get_ec2_instance_availability_zone {
@@ -95,10 +95,10 @@ EOF
 # of the replica cluster, so we return that.
 function get_cluster_size {
   local -r asg_name="$1"
-  local -r aws_region="$2"
+  local -r region="$2"
 
   # All the variables are env vars set in docker-compose.yml
-  if [[ "$aws_region" == "$mock_aws_region" ]]; then
+  if [[ "$region" == "$aws_region" ]]; then
     echo -n "$cluster_size"
   else
     echo -n "$replica_cluster_size"
@@ -110,10 +110,10 @@ function get_cluster_size {
 # requesting looking for containers in the replica cluster, so we return that.
 function get_container_basename {
   local -r asg_name="$1"
-  local -r aws_region="$2"
+  local -r region="$2"
 
   # All the variables are env vars set in docker-compose.yml
-  if [[ "$aws_region" == "$mock_aws_region" ]]; then
+  if [[ "$region" == "$aws_region" ]]; then
     echo -n "$data_node_container_base_name"
   else
     echo -n "$replica_data_node_container_base_name"

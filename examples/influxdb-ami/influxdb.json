@@ -67,7 +67,7 @@
     "type": "shell",
     "inline": [
       "sudo yum update -y",
-      "sudo yum install -y git jq"
+      "sudo yum install -y git jq polkit"
     ],
     "only": ["influxdb-ami-amazon-linux"]
   },{

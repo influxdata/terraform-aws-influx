@@ -1,0 +1,54 @@
+defaults: &defaults
+  working_directory: /home/circleci/.go_workspace/src/github.com/gruntwork-io/terraform-aws-influx
+  machine:
+    image: circleci/classic:201711-01
+#  docker:
+#    - image: circleci/golang:1.10
+
+version: 2.0
+jobs:
+  test aws:
+    <<: *defaults
+    steps:
+      - checkout
+      - run: &install_gruntwork_tooling
+          name: install gruntwork tooling
+          command: |
+            sudo apt-get -y update
+            curl -Ls https://raw.githubusercontent.com/gruntwork-io/gruntwork-installer/master/bootstrap-gruntwork-installer.sh | bash /dev/stdin --version v0.0.21
+            gruntwork-install --module-name "gruntwork-module-circleci-helpers" --repo "https://github.com/gruntwork-io/module-ci" --tag "v0.13.3"
+            configure-environment-for-gruntwork-module --circle-ci-2 --use-go-dep --go-src-path test
+
+      - run:
+          name: install terratest log parser
+          command: |
+            gruntwork-install --binary-name 'terratest_log_parser' --repo 'https://github.com/gruntwork-io/terratest' --tag 'v0.13.8'
+
+      - run:
+          name: create log directory
+          command: mkdir -p /tmp/logs
+
+      - run:
+          name: run tests
+          command: run-go-tests --path test --timeout 1h --circle-ci-2 | tee /tmp/logs/all.log
+          no_output_timeout: 3600s
+
+      - run:
+          name: parse test output
+          command: terratest_log_parser --testlog /tmp/logs/all.log --outputdir /tmp/logs
+          when: always
+
+      - store_artifacts:
+          path: /tmp/logs
+      - store_test_results:
+          path: /tmp/logs
+
+
+workflows:
+  version: 2
+  build-and-test:
+    jobs:
+      - test aws:
+          filters:
+            tags:
+              only: /^v.*/

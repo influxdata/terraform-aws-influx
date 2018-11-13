@@ -6,6 +6,8 @@ set -e
 readonly BASH_COMMONS_DIR="/opt/gruntwork/bash-commons"
 readonly DEFAULT_META_CONFIG_FILE_PATH="/etc/influxdb/influxdb-meta.conf"
 readonly DEFAULT_DATA_CONFIG_FILE_PATH="/etc/influxdb/influxdb.conf"
+readonly MAX_RETRIES=60
+readonly SLEEP_BETWEEN_RETRIES_SEC=5
 
 if [[ ! -d "$BASH_COMMONS_DIR" ]]; then
   echo "ERROR: this script requires that bash-commons is installed in $BASH_COMMONS_DIR. See https://github.com/gruntwork-io/bash-commons for more info."
@@ -107,22 +109,107 @@ function discover_nodes {
   echo "${hosts[@]}"
 }
 
+function join_cluster {
+  local -r node_type="$1"
+  local -r node_hostname="$2"
+  local -r rally_point_hostname="$3"
+
+  set +e
+
+  if [[ "$node_hostname" == "$rally_point_hostname" ]]; then
+
+    log_info "This server is the rally point for the cluster."
+
+    if [[ "$node_type" == "meta" ]]; then
+      influxd-ctl add-meta "$node_hostname:8091"
+      echo -n "$?"
+    else
+      influxd-ctl add-data "$node_hostname:8088"
+      echo -n "$?"
+    fi
+
+  else
+
+    log_info "The rally point for the cluster is $rally_point_hostname"
+
+    if [[ "$node_type" == "meta" ]]; then
+      influxd-ctl -bind "$rally_point_hostname:8091" add-meta "$node_hostname:8091"
+      echo -n "$?"
+    else
+      influxd-ctl -bind "$rally_point_hostname:8091" add-data "$node_hostname:8088"
+      echo -n "$?"
+    fi
+
+  fi
+
+  set -e
+}
+
+function wait_for_node_to_join_cluster {
+  local -r node_type="$1"
+  local -r node_hostname="$2"
+  local -r rally_point_hostname="$3"
+
+  for (( i=0; i<"$MAX_RETRIES"; i++ )); do
+    local exit_code
+    exit_code=$(join_cluster "$node_type" "$node_hostname" "$rally_point_hostname")
+
+    if [[ "$exit_code" == "1" ]]; then
+      log_warn "InfluxDB meta node $rally_point_hostname is not yet ready. Will sleep for $SLEEP_BETWEEN_RETRIES_SEC seconds and check again."
+      sleep "$SLEEP_BETWEEN_RETRIES_SEC"
+    else
+      log_info "$node_hostname joined the cluster successfully."
+      return
+    fi
+  done
+
+  log_error "InfluxDB meta node $rally_point_hostname still not ready after $MAX_RETRIES retries."
+  exit 1
+}
+
 function start_influxdb {
   local -r node_type="$1"
+
+  set +e
 
   if [[ "$node_type" == "meta" ]]; then
     log_info "Starting InfluxDB Meta Service"
     sudo systemctl enable influxdb-meta.service
     sudo systemctl start influxdb-meta.service
+    echo -n "$?"
   else
     log_info "Starting InfluxDB Data Service"
     sudo systemctl enable influxdb.service
     sudo systemctl start influxdb.service
+    echo -n "$?"
   fi
 
-  # The services need a few seconds to fully initialize
-  # before we start hitting them with cluster operation requests
-  sleep 5
+  set -e
+}
+
+function wait_for_service_to_start {
+  local -r node_type="$1"
+  local -r max_retries=5
+  local -r sleep_between_retries=5
+
+  for (( i=0; i<"$max_retries"; i++ )); do
+    local exit_code
+    exit_code=$(start_influxdb "$node_type")
+
+    if [[ "$exit_code" == "0" ]]; then
+      log_info "Service started successfully."
+      # The services need a few seconds to fully initialize
+      # before we start hitting them with cluster operation requests
+      sleep 5
+      return
+    else
+      log_warn "Service couldn't start. Will sleep for $sleep_between_retries seconds and try again."
+      sleep "$sleep_between_retries"
+    fi
+  done
+
+  log_error "Service failed to start after $max_retries retries."
+  exit 1
 }
 
 function run_influxdb {
@@ -194,33 +281,12 @@ function run_influxdb {
   fi
 
   discover_all_nodes "$meta_asg_name" "$data_asg_name" "$region"
-  start_influxdb "$node_type"
+  wait_for_service_to_start "$node_type"
 
   local rally_point_hostname
   rally_point_hostname=$(get_rally_point_hostname "$meta_asg_name" "$region")
 
-  if [[ "$node_hostname" == "$rally_point_hostname" ]]; then
-
-    log_info "This server is the rally point for the cluster."
-
-    if [[ "$node_type" == "meta" ]]; then
-      influxd-ctl add-meta "$node_hostname:8091"
-    else
-      influxd-ctl add-data "$node_hostname:8088"
-    fi
-
-  else
-
-    log_info "The rally point for the cluster is $rally_point_hostname"
-
-    if [[ "$node_type" == "meta" ]]; then
-      influxd-ctl -bind "$rally_point_hostname:8091" add-meta "$node_hostname:8091"
-    else
-      influxd-ctl -bind "$rally_point_hostname:8091" add-data "$node_hostname:8088"
-    fi
-
-  fi
-
+  wait_for_node_to_join_cluster "$node_type" "$node_hostname" "$rally_point_hostname"  
 }
 
 run_influxdb "$@"

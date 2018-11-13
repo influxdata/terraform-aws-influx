@@ -1,6 +1,7 @@
-# InfluxDB Docker
+# Local mocks
 
-This folder contains some mocks that make it possible to run and test InfluxDB locally, using Docker and Docker Compose. The mocks here replace external dependencies, such as EC2 metadata and AWS API calls, with mocks that work 
+This folder contains some mocks that make it possible to run and test InfluxDB locally, using Docker and Docker 
+Compose. The mocks here replace external dependencies, such as EC2 metadata and AWS API calls, with mocks that work 
 locally. This is solely to make testing and iterating on the code faster and easier and should NOT be used in 
 production!
 
@@ -14,13 +15,13 @@ image with InfluxDB installed on Ubuntu:
 packer build -only=influxdb-docker-ubuntu influxdb.json
 ```
 
-To run the Docker image, run:
+To run the Docker image, head into one of the `examples/influxdb-xxx/local-test` folders and run:
 
 ```
 docker-compose up
 ```
 
-Alternatively, to create an Amazon Linux Docker image:
+Alternatively, to create an Amazon Linux 2 Docker image:
 
 ```
 packer build -only=influxdb-docker-amazon-linux influxdb.json
@@ -32,4 +33,6 @@ And to run it:
 OS_NAME=amazon-linux docker-compose up
 ```
 
-Wait 10-15 seconds and then connect to http://localhost:8086/ using the InfluxDB CLI
+Wait 10-15 seconds and then run the `influx` CLI without any arguments to connect! No
+credentials are required to login.
+

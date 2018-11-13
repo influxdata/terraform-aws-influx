@@ -16,16 +16,17 @@ services:
       - /sys/fs/cgroup:/sys/fs/cgroup:ro
 
       # Mount these scripts so we get hot reload
-      - ../../modules/run-influxdb/run-influxdb:/opt/influxdb/bin/run-influxdb
-      - ../../modules/influxdb-commons:/opt/influxdb-commons
+      - ../../../modules/run-influxdb/run-influxdb:/opt/influxdb/bin/run-influxdb
+      - ../../../modules/influxdb-commons:/opt/influxdb-commons
 
       # Override scripts with mocks so we can run locally, without talking to AWS APIs
-      - ./local-mocks/aws.sh:/opt/gruntwork/bash-commons/aws.sh
-      - ./local-mocks/mount-volume.sh:/opt/influxdb-commons/mount-volume.sh
+      - ../../local-mocks/aws.sh:/opt/gruntwork/bash-commons/aws.sh
+      - ../../local-mocks/mount-volume.sh:/opt/influxdb-commons/mount-volume.sh
+      - ../../local-mocks/influxdb-common.sh:/opt/influxdb-commons/influxdb-common.sh
 
       # Mount the scripts we use to run InfluxDB during Docker container boot
-      - ./user-data:/user-data
-      - ./local-mocks/entrypoint.sh:/entrypoint/entrypoint.sh
+      - ../user-data:/user-data
+      - ../../local-mocks/entrypoint.sh:/entrypoint/entrypoint.sh
 
     environment:
       # The User Data script that will be executed on boot by entrypoint.sh
@@ -35,7 +36,7 @@ services:
       # the User Data script, with the USER_DATA_ENV_ portion stripped off.
       USER_DATA_ENV_cluster_asg_name: mock-influxdb-asg
       USER_DATA_ENV_cluster_size: 1
-      USER_DATA_ENV_mock_aws_region: us-east-1
+      USER_DATA_ENV_aws_region: us-east-1
       USER_DATA_ENV_license_key: ${LICENSE_KEY}
       USER_DATA_ENV_shared_secret: ${SHARED_SECRET}
       USER_DATA_ENV_data_node_container_base_name: ${CONTAINER_BASE_NAME}
