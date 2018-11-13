@@ -6,6 +6,8 @@ set -e
 readonly BASH_COMMONS_DIR="/opt/gruntwork/bash-commons"
 readonly DEFAULT_META_CONFIG_FILE_PATH="/etc/influxdb/influxdb-meta.conf"
 readonly DEFAULT_DATA_CONFIG_FILE_PATH="/etc/influxdb/influxdb.conf"
+readonly MAX_RETRIES=60
+readonly SLEEP_BETWEEN_RETRIES_SEC=5
 
 if [[ ! -d "$BASH_COMMONS_DIR" ]]; then
   echo "ERROR: this script requires that bash-commons is installed in $BASH_COMMONS_DIR. See https://github.com/gruntwork-io/bash-commons for more info."
@@ -107,6 +109,34 @@ function discover_nodes {
   echo "${hosts[@]}"
 }
 
+function join_cluster {
+  local -r node_type="$1"
+  local -r node_hostname="$2"
+  local -r rally_point_hostname="$3"
+
+  if [[ "$node_hostname" == "$rally_point_hostname" ]]; then
+
+    log_info "This server is the rally point for the cluster."
+
+    if [[ "$node_type" == "meta" ]]; then
+      influxd-ctl add-meta "$node_hostname:8091"
+    else
+      influxd-ctl add-data "$node_hostname:8088"
+    fi
+
+  else
+
+    log_info "The rally point for the cluster is $rally_point_hostname"
+
+    if [[ "$node_type" == "meta" ]]; then
+      influxd-ctl -bind "$rally_point_hostname:8091" add-meta "$node_hostname:8091"
+    else
+      influxd-ctl -bind "$rally_point_hostname:8091" add-data "$node_hostname:8088"
+    fi
+
+  fi
+}
+
 function start_influxdb {
   local -r node_type="$1"
 
@@ -199,28 +229,7 @@ function run_influxdb {
   local rally_point_hostname
   rally_point_hostname=$(get_rally_point_hostname "$meta_asg_name" "$region")
 
-  if [[ "$node_hostname" == "$rally_point_hostname" ]]; then
-
-    log_info "This server is the rally point for the cluster."
-
-    if [[ "$node_type" == "meta" ]]; then
-      influxd-ctl add-meta "$node_hostname:8091"
-    else
-      influxd-ctl add-data "$node_hostname:8088"
-    fi
-
-  else
-
-    log_info "The rally point for the cluster is $rally_point_hostname"
-
-    if [[ "$node_type" == "meta" ]]; then
-      influxd-ctl -bind "$rally_point_hostname:8091" add-meta "$node_hostname:8091"
-    else
-      influxd-ctl -bind "$rally_point_hostname:8091" add-data "$node_hostname:8088"
-    fi
-
-  fi
-
+  join_cluster "$node_type" "$node_hostname" "$rally_point_hostname"
 }
 
 run_influxdb "$@"
