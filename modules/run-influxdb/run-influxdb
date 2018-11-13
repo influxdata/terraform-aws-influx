@@ -114,14 +114,18 @@ function join_cluster {
   local -r node_hostname="$2"
   local -r rally_point_hostname="$3"
 
+  set +e
+
   if [[ "$node_hostname" == "$rally_point_hostname" ]]; then
 
     log_info "This server is the rally point for the cluster."
 
     if [[ "$node_type" == "meta" ]]; then
       influxd-ctl add-meta "$node_hostname:8091"
+      echo -n "$?"
     else
       influxd-ctl add-data "$node_hostname:8088"
+      echo -n "$?"
     fi
 
   else
@@ -130,11 +134,37 @@ function join_cluster {
 
     if [[ "$node_type" == "meta" ]]; then
       influxd-ctl -bind "$rally_point_hostname:8091" add-meta "$node_hostname:8091"
+      echo -n "$?"
     else
       influxd-ctl -bind "$rally_point_hostname:8091" add-data "$node_hostname:8088"
+      echo -n "$?"
     fi
 
   fi
+
+  set -e
+}
+
+function wait_for_node_to_join_cluster {
+  local -r node_type="$1"
+  local -r node_hostname="$2"
+  local -r rally_point_hostname="$3"
+
+  for (( i=0; i<"$MAX_RETRIES"; i++ )); do
+    local exit_code
+    exit_code=$(join_cluster "$node_type" "$node_hostname" "$rally_point_hostname")
+
+    if [[ "$exit_code" == "1" ]]; then
+      log_warn "InfluxDB meta node $rally_point_hostname is not yet ready. Will sleep for $SLEEP_BETWEEN_RETRIES_SEC seconds and check again."
+      sleep "$SLEEP_BETWEEN_RETRIES_SEC"
+    else
+      log_info "$node_hostname joined the cluster successfully."
+      return
+    fi
+  done
+
+  log_error "InfluxDB meta node $rally_point_hostname still not ready after $MAX_RETRIES retries."
+  exit 1
 }
 
 function start_influxdb {
@@ -229,7 +259,7 @@ function run_influxdb {
   local rally_point_hostname
   rally_point_hostname=$(get_rally_point_hostname "$meta_asg_name" "$region")
 
-  join_cluster "$node_type" "$node_hostname" "$rally_point_hostname"
+  wait_for_node_to_join_cluster "$node_type" "$node_hostname" "$rally_point_hostname"  
 }
 
 run_influxdb "$@"

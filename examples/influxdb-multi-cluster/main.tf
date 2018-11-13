@@ -150,10 +150,7 @@ data "template_file" "user_data_influxdb_data_nodes" {
   template = "${file("${path.module}/user-data/data-node/user-data.sh")}"
 
   vars {
-    # Make Data cluster depend on Meta cluster to ensure that the rally point
-    # Meta node is in a state to receive join requests from data nodes
-    meta_cluster_asg_name = "${module.influxdb_meta_nodes.asg_name}"
-
+    meta_cluster_asg_name = "${var.influxdb_meta_nodes_cluster_name}"
     data_cluster_asg_name = "${var.influxdb_data_nodes_cluster_name}"
     aws_region            = "${var.aws_region}"
     license_key           = "${var.license_key}"
