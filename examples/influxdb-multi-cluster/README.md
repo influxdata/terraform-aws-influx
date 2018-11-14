@@ -5,6 +5,8 @@ This folder shows an example of Terraform code that uses the
 module to deploy a [InfluxDB Enterprise](https://www.influxdata.com/time-series-platform/influxdb/) cluster in [AWS](https://aws.amazon.com/). The cluster 
 consists of two Auto Scaling Groups (ASGs): one for meta nodes and one for data nodes.
 
+![InfluxDB multi-cluster architecture](https://github.com/gruntwork-io/terraform-aws-influx/blob/master/_docs/influxdb-multi-cluster-architecture.png?raw=true)
+
 You will need to create an [Amazon Machine Image (AMI)](http://docs.aws.amazon.com/AWSEC2/latest/UserGuide/AMIs.html) 
 that has InfluxDB installed, which you can do using the [influxdb-ami 
 example](https://github.com/gruntwork-io/terraform-aws-influx/tree/master/examples/influxdb-ami)). 
