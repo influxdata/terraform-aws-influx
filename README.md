@@ -5,6 +5,8 @@ using [Terraform](https://www.terraform.io/) and [Packer](https://www.packer.io/
 This module only supports the InfluxDB Enterprise Edition and not the Open Source edition.
 The rest of the [TICK stack](https://www.influxdata.com/time-series-platform/) is also not supported.
 
+![InfluxDB multi-cluster architecture](https://github.com/gruntwork-io/terraform-aws-influx/blob/master/_docs/influxdb-multi-cluster-architecture.png?raw=true)
+
 ## Quick start
 
 If you want to quickly spin up an InfluxDB cluster, you can run the simple example that is in the root of this repo.
