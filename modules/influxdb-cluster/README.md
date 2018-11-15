@@ -86,6 +86,11 @@ Instances should be running an AMI that has InfluxDB installed via the
 [install-influxdb](https://github.com/gruntwork-io/terraform-aws-influx/tree/master/modules/install-influxdb)
 module. You pass in the ID of the AMI to run using the `ami_id` input parameter.
 
+The [run-influxdb](https://github.com/gruntwork-io/terraform-aws-influx/tree/master/modules/run-influxdb) script ensures that
+a new node added by an ASG scale-up event automatically joins the existing cluster. However, you're responsible for de-registering
+any dead nodes (terminated EC2 instance) from the cluster when the ASG scales down. See the [cluster commands 
+guide](https://docs.influxdata.com/enterprise_influxdb/v1.5/features/cluster-commands/) for instructions.
+
 ### EBS Volumes
 
 This module can optionally create an [EBS volume](https://aws.amazon.com/ebs/) for each EC2 Instance in the ASG. You 
