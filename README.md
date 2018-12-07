@@ -1,6 +1,6 @@
 # InfluxDB AWS Module
 
-This repo contains a the **official** module for deploying [InfluxDB Enterprise](https://www.influxdata.com/time-series-platform/influxdb/) on [AWS](https://aws.amazon.com/) 
+This repo contains the **official** module for deploying [InfluxDB Enterprise](https://www.influxdata.com/time-series-platform/influxdb/) on [AWS](https://aws.amazon.com/) 
 using [Terraform](https://www.terraform.io/) and [Packer](https://www.packer.io/). InfluxDB is a distributed time series database.
 This module only supports the InfluxDB Enterprise Edition and not the Open Source edition.
 The rest of the [TICK stack](https://www.influxdata.com/time-series-platform/) is also not supported.
