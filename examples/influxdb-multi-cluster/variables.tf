@@ -11,14 +11,6 @@
 # You must provide a value for each of these parameters.
 # ---------------------------------------------------------------------------------------------------------------------
 
-variable "aws_region" {
-  description = "The AWS region in which all resources will be created"
-}
-
-variable "ami_id" {
-  description = "The ID of the AMI to run in the cluster. This should be an AMI built from the Packer template under examples/influxdb-ami/influxdb.json."
-}
-
 variable "license_key" {
   description = "The key of your InfluxDB Enterprise license. This should not be set in plain-text and can be passed in as an env var or from a secrets management tool."
 }
@@ -31,6 +23,16 @@ variable "shared_secret" {
 # OPTIONAL PARAMETERS
 # These parameters have reasonable defaults.
 # ---------------------------------------------------------------------------------------------------------------------
+
+variable "aws_region" {
+  description = "The AWS region in which all resources will be created"
+  default     = "us-east-1"
+}
+
+variable "ami_id" {
+  description = "The ID of the AMI to run in the cluster. This should be an AMI built from the Packer template under examples/influxdb-ami/influxdb.json."
+  default     = ""
+}
 
 variable "api_port" {
   description = "The HTTP API port the Data nodes listen on for external communication."
