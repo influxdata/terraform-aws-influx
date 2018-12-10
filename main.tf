@@ -9,6 +9,41 @@ provider "aws" {
   region = "${var.aws_region}"
 }
 
+# ---------------------------------------------------------------------------------------------------------------------
+# USE THE PUBLIC EXAMPLE AMIS IF VAR.AMI_ID IS NOT SPECIFIED
+# We have published some example AMIs publicly that will be used if var.ami_id is not specified. This makes it easier
+# to try these examples out, but we recommend you build your own AMIs for production use.
+# ---------------------------------------------------------------------------------------------------------------------
+
+data "aws_ami" "influxdb_ubuntu_example" {
+  most_recent = true
+  owners      = ["087285199408"] # Gruntwork
+
+  filter {
+    name   = "virtualization-type"
+    values = ["hvm"]
+  }
+
+  filter {
+    name   = "architecture"
+    values = ["x86_64"]
+  }
+
+  filter {
+    name   = "image-type"
+    values = ["machine"]
+  }
+
+  filter {
+    name   = "name"
+    values = ["*influxdb-ubuntu-example*"]
+  }
+}
+
+data "template_file" "ami_id" {
+  template = "${var.ami_id == "" ? data.aws_ami.influxdb_ubuntu_example.id : var.ami_id}"
+}
+
 module "influxdb" {
   # When using these modules in your own code, you will need to use a Git URL with a ref attribute that pins you
   # to a specific version of the modules, such as the following example:
@@ -23,7 +58,7 @@ module "influxdb" {
   # R4 or M4 instances.
   instance_type = "t2.micro"
 
-  ami_id    = "${var.ami_id}"
+  ami_id    = "${data.template_file.ami_id.rendered}"
   user_data = "${data.template_file.user_data_influxdb.rendered}"
 
   vpc_id     = "${data.aws_vpc.default.id}"
