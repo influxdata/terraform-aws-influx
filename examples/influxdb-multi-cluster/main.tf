@@ -17,7 +17,7 @@ provider "aws" {
 
 data "aws_ami" "influxdb_ubuntu_example" {
   most_recent = true
-  owners      = ["087285199408"] # Gruntwork
+  owners      = ["562637147889"] # Gruntwork
 
   filter {
     name   = "virtualization-type"
