@@ -7,7 +7,7 @@ defaults: &defaults
 
 version: 2.0
 jobs:
-  test aws:
+  test:
     <<: *defaults
     steps:
       - checkout
@@ -43,12 +43,38 @@ jobs:
       - store_test_results:
           path: /tmp/logs
 
+  release:
+    machine: true
+    steps:
+      - checkout
+
+      # The weird way you have to set PATH in Circle 2.0
+      - run: echo 'export PATH=$HOME/.local/bin:$HOME/terraform:$HOME/packer:$PATH' >> $BASH_ENV
+
+      # Use the Gruntwork Installer to install the gruntwork-module-circleci-helpers
+      - run: curl -Ls https://raw.githubusercontent.com/gruntwork-io/gruntwork-installer/master/bootstrap-gruntwork-installer.sh | bash /dev/stdin --version v0.0.21
+      - run: gruntwork-install --module-name "gruntwork-module-circleci-helpers" --repo "https://github.com/gruntwork-io/module-ci" --tag "v0.13.3"
+      - run: gruntwork-install --module-name "build-helpers" --repo "https://github.com/gruntwork-io/module-ci" --tag "v0.13.3"
+      - run: gruntwork-install --module-name "aws-helpers" --repo "https://github.com/gruntwork-io/module-ci" --tag "v0.13.3"
+      - run: configure-environment-for-gruntwork-module --circle-ci-2-machine-executor --go-src-path test --use-go-dep --terraform-version NONE --terragrunt-version NONE --glide-version NONE
+
+      - run: ~/project/.circleci/publish-amis.sh "influxdb-ami-ubuntu"
+      - run: ~/project/.circleci/publish-amis.sh "influxdb-ami-amazon-linux"
 
 workflows:
   version: 2
   build-and-test:
     jobs:
-      - test aws:
+      - test:
           filters:
             tags:
               only: /^v.*/
+      - release:
+          requires:
+            - test
+          # Publish new AMIs whenever a new vesion (e.g., v0.3.4) is released
+          filters:
+            tags:
+              only: /^v.*/
+            branches:
+              ignore: /.*/
