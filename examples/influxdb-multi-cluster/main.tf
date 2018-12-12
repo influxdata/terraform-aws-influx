@@ -10,6 +10,41 @@ provider "aws" {
 }
 
 # ---------------------------------------------------------------------------------------------------------------------
+# USE THE PUBLIC EXAMPLE AMIS IF VAR.AMI_ID IS NOT SPECIFIED
+# We have published some example AMIs publicly that will be used if var.ami_id is not specified. This makes it easier
+# to try these examples out, but we recommend you build your own AMIs for production use.
+# ---------------------------------------------------------------------------------------------------------------------
+
+data "aws_ami" "influxdb_ubuntu_example" {
+  most_recent = true
+  owners      = ["562637147889"] # Gruntwork
+
+  filter {
+    name   = "virtualization-type"
+    values = ["hvm"]
+  }
+
+  filter {
+    name   = "architecture"
+    values = ["x86_64"]
+  }
+
+  filter {
+    name   = "image-type"
+    values = ["machine"]
+  }
+
+  filter {
+    name   = "name"
+    values = ["*influxdb-ubuntu-example*"]
+  }
+}
+
+locals = {
+  ami_id = "${var.ami_id == "" ? data.aws_ami.influxdb_ubuntu_example.id : var.ami_id}"
+}
+
+# ---------------------------------------------------------------------------------------------------------------------
 # DEPLOY THE INFLUXDB META NODES CLUSTER
 # ---------------------------------------------------------------------------------------------------------------------
 
@@ -27,7 +62,7 @@ module "influxdb_meta_nodes" {
   # R4 or M4 instances.
   instance_type = "t2.micro"
 
-  ami_id    = "${var.ami_id}"
+  ami_id    = "${local.ami_id}"
   user_data = "${data.template_file.user_data_influxdb_meta_nodes.rendered}"
 
   vpc_id     = "${data.aws_vpc.default.id}"
@@ -84,7 +119,7 @@ module "influxdb_data_nodes" {
   # R4 or M4 instances.
   instance_type = "t2.micro"
 
-  ami_id    = "${var.ami_id}"
+  ami_id    = "${local.ami_id}"
   user_data = "${data.template_file.user_data_influxdb_data_nodes.rendered}"
 
   vpc_id     = "${data.aws_vpc.default.id}"
