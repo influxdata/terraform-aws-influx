@@ -40,8 +40,8 @@ data "aws_ami" "influxdb_ubuntu_example" {
   }
 }
 
-data "template_file" "ami_id" {
-  template = "${var.ami_id == "" ? data.aws_ami.influxdb_ubuntu_example.id : var.ami_id}"
+locals = {
+  ami_id = "${var.ami_id == "" ? data.aws_ami.influxdb_ubuntu_example.id : var.ami_id}"
 }
 
 # ---------------------------------------------------------------------------------------------------------------------
@@ -62,7 +62,7 @@ module "influxdb_meta_nodes" {
   # R4 or M4 instances.
   instance_type = "t2.micro"
 
-  ami_id    = "${data.template_file.ami_id.rendered}"
+  ami_id    = "${local.ami_id}"
   user_data = "${data.template_file.user_data_influxdb_meta_nodes.rendered}"
 
   vpc_id     = "${data.aws_vpc.default.id}"
@@ -119,7 +119,7 @@ module "influxdb_data_nodes" {
   # R4 or M4 instances.
   instance_type = "t2.micro"
 
-  ami_id    = "${data.template_file.ami_id.rendered}"
+  ami_id    = "${local.ami_id}"
   user_data = "${data.template_file.user_data_influxdb_data_nodes.rendered}"
 
   vpc_id     = "${data.aws_vpc.default.id}"
