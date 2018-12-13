@@ -1,3 +1,4 @@
+[![Maintained by Gruntwork.io](https://img.shields.io/badge/maintained%20by-gruntwork.io-%235849a6.svg)](https://gruntwork.io)
 # InfluxDB AWS Module
 
 This repo contains the **official** module for deploying [InfluxDB Enterprise](https://www.influxdata.com/time-series-platform/influxdb/) on [AWS](https://aws.amazon.com/) 
