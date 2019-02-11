@@ -60,4 +60,4 @@ Example:
 The `install-telegraf` script does the following:
 
 1. Installs the Telegraf binary
-1. Replaces the default Telegraf config file with specified templated config file.
+1. Replaces the default Telegraf config file with your custom config file.

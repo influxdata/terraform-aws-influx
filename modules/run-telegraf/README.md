@@ -15,7 +15,18 @@ This script assumes you installed it, plus all of its dependencies (including Te
 
 This will:
 
-1. Fill out the templated configuration file with user supplied values.
+1. Fill out the templated configuration file with user supplied values. For example:
+
+    ```conf
+    ...
+    [[outputs.influxdb]]
+    ## The full HTTP or UDP URL for your InfluxDB instance.
+    urls = ["<__INFLUXDB_URL__>"]
+
+    ## The target database for metrics; will be created as needed.
+    database = ["<__DATABASE_NAME__>"]
+    ...
+    ```
 
 1. Start Telegraf on the machine.
 
