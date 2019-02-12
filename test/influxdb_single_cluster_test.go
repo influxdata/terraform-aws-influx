@@ -70,7 +70,7 @@ func TestInfluxDBSingleCluster(t *testing.T) {
 			})
 
 			test_structure.RunTestStage(t, "setup_ami", func() {
-				awsRegion := aws.GetRandomRegion(t, nil, nil)
+				awsRegion := aws.GetRandomRegion(t, nil, []string{"eu-north-1"})
 				amiID := buildAmi(t, templatePath, testCase.packerInfo.builderName, awsRegion)
 
 				uniqueID := strings.ToLower(random.UniqueId())
