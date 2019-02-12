@@ -42,7 +42,7 @@ function install_telegraf_on_ubuntu {
   local -r version="$1"
 
   log_info "Installing Telegraf"
-  wget https://dl.influxdata.com/telegraf/releases/telegraf_${version}-1_amd64.deb
+  wget "https://dl.influxdata.com/telegraf/releases/telegraf_${version}-1_amd64.deb"
   sudo dpkg -i "telegraf_${version}-1_amd64.deb"
 }
 

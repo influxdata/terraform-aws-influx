@@ -9,6 +9,10 @@ Images (AMIs)](http://docs.aws.amazon.com/AWSEC2/latest/UserGuide/AMIs.html) tha
 1. Ubuntu 18.04
 1. Amazon Linux 2
 
+Telegraf is usually installed as a collection agent on your application's EC2 instance(s).
+This Telegraf AMI is only useful for standing up Telegraf to pull remote data or accept data from a remote service,
+e.g. connecting to a queue like Kafka/PubSub or using it as a scraper to pull prometheus metrics.
+
 ## Quick start
 
 To build the Telegraf AMI:
