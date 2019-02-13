@@ -52,7 +52,7 @@ Options:
 
 Example:
 
-  run-telegraf --auto-fill '<__INFLUXDB_URL__>=http://localhost:8086'
+  run-telegraf --auto-fill '<__INFLUXDB_URL__>=http://localhost:8086' --auto-fill '<__DATABASE_NAME__>=telegraf'
 ```
 
 ## Debugging tips and tricks
