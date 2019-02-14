@@ -13,6 +13,7 @@ fi
 
 source "$BASH_COMMONS_DIR/assert.sh"
 source "$BASH_COMMONS_DIR/file.sh"
+source "$BASH_COMMONS_DIR/log.sh"
 
 function print_usage {
   echo
@@ -52,6 +53,10 @@ function run_telegraf {
   done
 
   file_fill_template "$DEFAULT_TELEGRAF_CONFIG_FILE_PATH" "${auto_fill[@]}"
+
+  log_info "Starting Telegraf"
+  sudo systemctl enable telegraf.service
+  sudo systemctl start telegraf.service
 }
 
 run_telegraf "$@"
