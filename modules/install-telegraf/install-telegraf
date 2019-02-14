@@ -29,7 +29,7 @@ function print_usage {
   echo
   echo "Options:"
   echo
-  echo -e "  --version\t\tThe version of InfluxDB Enterprise to install. Default: $DEFAULT_TELEGRAF_VERSION."
+  echo -e "  --version\t\tThe version of Telegraf to install. Default: $DEFAULT_TELEGRAF_VERSION."
   echo -e "  --config-file\t\tPath to a custom configuration file. Default: $DEFAULT_TEMP_TELEGRAF_CONFIG_FILE_PATH"
 
   echo
@@ -52,6 +52,17 @@ function install_telegraf_on_amazon_linux {
   log_info "Installing Telegraf"
   wget "https://dl.influxdata.com/telegraf/releases/telegraf-${version}-1.x86_64.rpm"
   sudo yum localinstall -y "telegraf-${version}-1.x86_64.rpm"
+}
+
+function install_telegraf_scripts {
+  local -r dest_dir="$1"
+
+  local -r run_telegraf_src="$SCRIPT_DIR/../run-telegraf/run-telegraf"
+  local -r run_telegraf_dest="$dest_dir/run-telegraf"
+
+  log_info "Copying $run_telegraf_src to $run_telegraf_dest"
+  sudo mkdir -p "$dest_dir"
+  sudo cp "$run_telegraf_src" "$run_telegraf_dest"
 }
 
 function install_telegraf {
@@ -98,7 +109,11 @@ function install_telegraf {
     exit 1
   fi
 
+  # Disable the installed systemd service to prevent it from starting up on boot
+  sudo systemctl disable telegraf.service
+
   sudo mv "$config_file" "$DEFAULT_TELEGRAF_CONFIG_FILE_PATH"
+  install_telegraf_scripts "$DEFAULT_TELEGRAF_BIN_DIR"
 }
 
 install_telegraf "$@"
