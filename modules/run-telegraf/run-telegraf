@@ -1,0 +1,62 @@
+#!/usr/bin/env bash
+
+set -e
+
+# Import the appropriate bash commons libraries
+readonly BASH_COMMONS_DIR="/opt/gruntwork/bash-commons"
+readonly DEFAULT_TELEGRAF_CONFIG_FILE_PATH="/etc/telegraf/telegraf.conf"
+
+if [[ ! -d "$BASH_COMMONS_DIR" ]]; then
+  echo "ERROR: this script requires that bash-commons is installed in $BASH_COMMONS_DIR. See https://github.com/gruntwork-io/bash-commons for more info."
+  exit 1
+fi
+
+source "$BASH_COMMONS_DIR/assert.sh"
+source "$BASH_COMMONS_DIR/file.sh"
+source "$BASH_COMMONS_DIR/log.sh"
+
+function print_usage {
+  echo
+  echo "Usage: run-telegraf [options]"
+  echo
+  echo "This script can be used to configure and initialize Telegraf. This script has been tested with Ubuntu 18.04 and Amazon Linux 2."
+  echo
+  echo "Options:"
+  echo
+  echo -e "  --auto-fill\tSearch the Telegraf config file for KEY and replace it with VALUE. May be repeated."
+
+  echo
+  echo "Example:"
+  echo
+  echo "  run-telegraf --auto-fill '<__INFLUXDB_URL__>=http://localhost:8086' --auto-fill '<__DATABASE_NAME__>=telegraf'"
+}
+
+function run_telegraf {
+  local -a auto_fill=()
+
+  while [[ $# > 0 ]]; do
+    local key="$1"
+    case "$key" in
+      --auto-fill)
+        assert_not_empty "$key" "$2"
+        auto_fill+=("$2")
+        shift
+        ;;
+      *)
+        echo "Unrecognized argument: $key"
+        print_usage
+        exit 1
+        ;;
+    esac
+
+    shift
+  done
+
+  file_fill_template "$DEFAULT_TELEGRAF_CONFIG_FILE_PATH" "${auto_fill[@]}"
+
+  log_info "Starting Telegraf"
+  sudo systemctl enable telegraf.service
+  sudo systemctl start telegraf.service
+}
+
+run_telegraf "$@"
