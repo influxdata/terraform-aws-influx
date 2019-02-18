@@ -1,0 +1,131 @@
+{
+  "min_packer_version": "0.12.0",
+  "variables": {
+    "aws_region": "us-east-1",
+    "base_ami_name": "tick",
+    "telegraf_version": "1.9.4",
+    "influxdb_version": "1.6.2"
+  },
+  "builders": [{
+    "name": "tick-ami-ubuntu",
+    "ami_name": "{{user `base_ami_name`}}-ubuntu-example-{{uuid | clean_ami_name}}",
+    "ami_description": "An Ubuntu 18.04 AMI that has the TICK stack installed.",
+    "instance_type": "t2.micro",
+    "region": "{{user `aws_region`}}",
+    "type": "amazon-ebs",
+    "source_ami_filter": {
+      "filters": {
+        "virtualization-type": "hvm",
+        "architecture": "x86_64",
+        "name": "*ubuntu-bionic-18.04-amd64-server-*",
+        "block-device-mapping.volume-type": "gp2",
+        "root-device-type": "ebs"
+      },
+      "owners": ["099720109477"],
+      "most_recent": true
+    },
+    "ssh_username": "ubuntu"
+  },{
+    "name": "tick-ami-amazon-linux",
+    "ami_name": "{{user `base_ami_name`}}-amazon-linux-example-{{uuid | clean_ami_name}}",
+    "ami_description": "An Amazon Linux 2 AMI that has the TICK installed.",
+    "instance_type": "t2.micro",
+    "region": "{{user `aws_region`}}",
+    "type": "amazon-ebs",
+    "source_ami_filter": {
+      "filters": {
+        "virtualization-type": "hvm",
+        "architecture": "x86_64",
+        "name": "amzn2-ami-hvm-*-x86_64-gp2",
+        "block-device-mapping.volume-type": "gp2",
+        "root-device-type": "ebs"
+      },
+      "owners": ["amazon"],
+      "most_recent": true
+    },
+    "ssh_username": "ec2-user"
+  },{
+    "name": "tick-docker-ubuntu",
+    "type": "docker",
+    "image": "ubuntu:18.04",
+    "commit": "true"
+  },{
+    "name": "tick-docker-amazon-linux",
+    "type": "docker",
+    "image": "amazonlinux:2",
+    "commit": "true"
+  }],
+  "provisioners": [{
+    "type": "shell",
+    "pause_before": "30s",
+    "inline": [
+      "DEBIAN_FRONTEND=noninteractive sudo apt-get update -y",
+      "sudo apt-get install -y jq python-pip",
+      "sudo -H pip install --upgrade awscli"
+    ],
+    "only": ["tick-ami-ubuntu"]
+  },{
+    "type": "shell",
+    "inline": [
+      "sudo yum update -y",
+      "sudo yum install -y git jq polkit"
+    ],
+    "only": ["tick-ami-amazon-linux"]
+  },{
+    "type": "shell",
+    "inline": [
+      "DEBIAN_FRONTEND=noninteractive apt-get update -y",
+      "apt-get install -y sudo wget git jq systemd"
+    ],
+    "only": ["tick-docker-ubuntu"]
+  },{
+    "type": "shell",
+    "inline": [
+      "yum update -y",
+      "yum install -y sudo wget git jq hostname"
+    ],
+    "only": ["tick-docker-amazon-linux"]
+  },{
+    "type": "shell",
+    "inline": [
+      "sudo mkdir -p /opt/gruntwork",
+      "git clone --branch v0.1.0 https://github.com/gruntwork-io/bash-commons.git /tmp/bash-commons",
+      "sudo cp -r /tmp/bash-commons/modules/bash-commons/src /opt/gruntwork/bash-commons",
+      "mkdir -p /tmp/terraform-aws-influx/modules",
+      "mkdir -p /tmp/config"
+    ]
+  },{
+    "type": "file",
+    "source": "{{template_dir}}/../telegraf-ami/config/telegraf.conf",
+    "destination": "/tmp/config/telegraf.conf"
+  },{
+    "type": "file",
+    "source": "{{template_dir}}/../influxdb-ami/config/influxdb-meta.conf",
+    "destination": "/tmp/config/influxdb-meta.conf"
+  },{
+    "type": "file",
+    "source": "{{template_dir}}/../influxdb-ami/config/influxdb.conf",
+    "destination": "/tmp/config/influxdb.conf"
+  },{
+    "type": "file",
+    "source": "{{template_dir}}/../../modules/",
+    "destination": "/tmp/terraform-aws-influx/modules"
+  },{
+    "type": "shell",
+    "inline": [
+      "/tmp/terraform-aws-influx/modules/install-telegraf/install-telegraf --version {{user `telegraf_version`}}",
+      "/tmp/terraform-aws-influx/modules/install-influxdb/install-influxdb --version {{user `influxdb_version`}}"
+    ]
+  }],
+  "post-processors": [{
+    "type": "docker-tag",
+    "repository": "gruntwork/tick-ubuntu",
+    "tag": "latest",
+    "only": ["tick-docker-ubuntu"]
+  },{
+    "type": "docker-tag",
+    "repository": "gruntwork/tick-amazon-linux",
+    "tag": "latest",
+    "only": ["tick-docker-amazon-linux"]
+  }]
+}
