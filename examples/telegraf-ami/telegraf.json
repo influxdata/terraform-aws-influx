@@ -104,7 +104,7 @@
     "only": ["telegraf-docker-ubuntu"]
   },{
     "type": "docker-tag",
-    "repository": "gruntwork/influxdb-amazon-linux",
+    "repository": "gruntwork/telegraf-amazon-linux",
     "tag": "latest",
     "only": ["telegraf-docker-amazon-linux"]
   }]
