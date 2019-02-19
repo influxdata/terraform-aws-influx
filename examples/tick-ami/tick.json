@@ -2,13 +2,14 @@
   "min_packer_version": "0.12.0",
   "variables": {
     "aws_region": "us-east-1",
-    "base_ami_name": "telegraf",
-    "version": "1.9.4"
+    "base_ami_name": "tick",
+    "telegraf_version": "1.9.4",
+    "influxdb_version": "1.6.2"
   },
   "builders": [{
-    "name": "telegraf-ami-ubuntu",
+    "name": "tick-ami-ubuntu",
     "ami_name": "{{user `base_ami_name`}}-ubuntu-example-{{uuid | clean_ami_name}}",
-    "ami_description": "An Ubuntu 18.04 AMI that has Telegraf installed.",
+    "ami_description": "An Ubuntu 18.04 AMI that has the TICK stack installed.",
     "instance_type": "t2.micro",
     "region": "{{user `aws_region`}}",
     "type": "amazon-ebs",
@@ -25,9 +26,9 @@
     },
     "ssh_username": "ubuntu"
   },{
-    "name": "telegraf-ami-amazon-linux",
+    "name": "tick-ami-amazon-linux",
     "ami_name": "{{user `base_ami_name`}}-amazon-linux-example-{{uuid | clean_ami_name}}",
-    "ami_description": "An Amazon Linux 2 AMI that has Telegraf installed.",
+    "ami_description": "An Amazon Linux 2 AMI that has the TICK installed.",
     "instance_type": "t2.micro",
     "region": "{{user `aws_region`}}",
     "type": "amazon-ebs",
@@ -44,49 +45,67 @@
     },
     "ssh_username": "ec2-user"
   },{
-    "name": "telegraf-docker-ubuntu",
+    "name": "tick-docker-ubuntu",
     "type": "docker",
     "image": "ubuntu:18.04",
     "commit": "true"
   },{
-    "name": "telegraf-docker-amazon-linux",
+    "name": "tick-docker-amazon-linux",
     "type": "docker",
     "image": "amazonlinux:2",
     "commit": "true"
   }],
   "provisioners": [{
     "type": "shell",
+    "pause_before": "30s",
+    "inline": [
+      "DEBIAN_FRONTEND=noninteractive sudo apt-get update -y",
+      "sudo apt-get install -y jq python-pip",
+      "sudo -H pip install --upgrade awscli"
+    ],
+    "only": ["tick-ami-ubuntu"]
+  },{
+    "type": "shell",
     "inline": [
       "sudo yum update -y",
-      "sudo yum install -y git"
+      "sudo yum install -y git jq polkit"
     ],
-    "only": ["telegraf-ami-amazon-linux"]
+    "only": ["tick-ami-amazon-linux"]
   },{
     "type": "shell",
     "inline": [
       "DEBIAN_FRONTEND=noninteractive apt-get update -y",
-      "apt-get install -y sudo wget git systemd"
+      "apt-get install -y sudo wget git jq systemd"
     ],
-    "only": ["telegraf-docker-ubuntu"]
+    "only": ["tick-docker-ubuntu"]
   },{
     "type": "shell",
     "inline": [
       "yum update -y",
-      "yum install -y sudo wget git"
+      "yum install -y sudo wget git jq hostname"
     ],
-    "only": ["telegraf-docker-amazon-linux"]
+    "only": ["tick-docker-amazon-linux"]
   },{
     "type": "shell",
     "inline": [
       "sudo mkdir -p /opt/gruntwork",
       "git clone --branch v0.1.0 https://github.com/gruntwork-io/bash-commons.git /tmp/bash-commons",
       "sudo cp -r /tmp/bash-commons/modules/bash-commons/src /opt/gruntwork/bash-commons",
-      "mkdir -p /tmp/terraform-aws-influx/modules"
+      "mkdir -p /tmp/terraform-aws-influx/modules",
+      "mkdir -p /tmp/config"
     ]
   },{
     "type": "file",
-    "source": "{{template_dir}}/config",
-    "destination": "/tmp"
+    "source": "{{template_dir}}/../telegraf-ami/config/telegraf.conf",
+    "destination": "/tmp/config/telegraf.conf"
+  },{
+    "type": "file",
+    "source": "{{template_dir}}/../influxdb-ami/config/influxdb-meta.conf",
+    "destination": "/tmp/config/influxdb-meta.conf"
+  },{
+    "type": "file",
+    "source": "{{template_dir}}/../influxdb-ami/config/influxdb.conf",
+    "destination": "/tmp/config/influxdb.conf"
   },{
     "type": "file",
     "source": "{{template_dir}}/../../modules/",
@@ -94,18 +113,19 @@
   },{
     "type": "shell",
     "inline": [
-      "/tmp/terraform-aws-influx/modules/install-telegraf/install-telegraf --version {{user `version`}}"
+      "/tmp/terraform-aws-influx/modules/install-telegraf/install-telegraf --version {{user `telegraf_version`}}",
+      "/tmp/terraform-aws-influx/modules/install-influxdb/install-influxdb --version {{user `influxdb_version`}}"
     ]
   }],
   "post-processors": [{
     "type": "docker-tag",
-    "repository": "gruntwork/telegraf-ubuntu",
+    "repository": "gruntwork/tick-ubuntu",
     "tag": "latest",
-    "only": ["telegraf-docker-ubuntu"]
+    "only": ["tick-docker-ubuntu"]
   },{
     "type": "docker-tag",
-    "repository": "gruntwork/telegraf-amazon-linux",
+    "repository": "gruntwork/tick-amazon-linux",
     "tag": "latest",
-    "only": ["telegraf-docker-amazon-linux"]
+    "only": ["tick-docker-amazon-linux"]
   }]
 }
