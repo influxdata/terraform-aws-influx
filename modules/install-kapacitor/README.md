@@ -1,6 +1,6 @@
 # Kapacitor Install Script
 
-Kapacitor is is a Real-Time Streaming Data Processing Engine
+Kapacitor is a Real-Time Streaming Data Processing Engine.
 This folder contains a script for installing Kapacitor Enterprise and its dependencies.
 
 This script has been tested on the following operating systems:
