@@ -53,11 +53,11 @@ You can find the other parameters in [variables.tf](variables.tf).
 Check out the [examples folder](https://github.com/gruntwork-io/terraform-aws-influx/tree/master/examples) for 
 fully-working sample code.
 
-## Why Kapacitor enterprise?
+## Why Kapacitor Enterprise?
 
-Unlike the Enterprise edition which distributes the entire Kapacitor deployment across multiple nodes in a cluster,
-the OSS edition is a single binary that can simply be installed on a single instance. This makes a robust module like this one
-quite unnecessary for single instance Kapacitor OSS deployments.
+The Enterprise edition of Kapacitor is the only flavor that supports deployment across multiple nodes in a luster. The OSS edition
+is distributed as a single binary to be installed on a single instance. This makes a robust module like this one only useful for
+the cluster deployment capacilities of the enterprise edition.
 
 ## What's included in this module?
 
