@@ -28,7 +28,7 @@
   },{
     "name": "tick-ami-amazon-linux",
     "ami_name": "{{user `base_ami_name`}}-amazon-linux-example-{{uuid | clean_ami_name}}",
-    "ami_description": "An Amazon Linux 2 AMI that has the TICK installed.",
+    "ami_description": "An Amazon Linux 2 AMI that has the TICK stack installed.",
     "instance_type": "t2.micro",
     "region": "{{user `aws_region`}}",
     "type": "amazon-ebs",
