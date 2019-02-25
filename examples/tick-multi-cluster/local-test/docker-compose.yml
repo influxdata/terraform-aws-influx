@@ -63,7 +63,7 @@ services:
   telegraf-0:
     image: gruntwork/telegraf-${OS_NAME}
     entrypoint: ["/entrypoint/entrypoint.sh"]
-    container_name: telegraf-meta-0
+    container_name: telegraf-0
 
     # Required to make systemd happy
     privileged: true
@@ -88,3 +88,36 @@ services:
       # the User Data script, with the USER_DATA_ENV_ portion stripped off.
       USER_DATA_ENV_influxdb_url: http://influxdb-data-0:8086
       USER_DATA_ENV_database_name: telegraf
+
+  chronograf-0:
+    image: gruntwork/chronograf-${OS_NAME}
+    entrypoint: ["/entrypoint/entrypoint.sh"]
+    container_name: chronograf-0
+
+    # Required to make systemd happy
+    privileged: true
+
+    volumes:
+      # Used for systemd
+      - /sys/fs/cgroup:/sys/fs/cgroup:ro
+
+      # Mount these scripts so we get hot reload
+      - ../../../modules/run-chronograf/run-chronograf:/opt/chronograf/bin/run-chronograf
+
+      # Mount the scripts we use to run Telegraf during Docker container boot
+      - ../user-data:/user-data
+      - ../../local-mocks/entrypoint.sh:/entrypoint/entrypoint.sh
+
+    container_name: chronograf-0
+    environment:
+      # The User Data script that will be executed on boot by entrypoint.sh
+      USER_DATA_SCRIPT: /user-data/chronograf/user-data.sh
+
+      # Any environment variable starting with USER_DATA_ENV_ will be read in by entrypoint.sh and made available in
+      # the User Data script, with the USER_DATA_ENV_ portion stripped off.
+      USER_DATA_ENV_host: 0.0.0.0
+      USER_DATA_ENV_port: 8888
+
+    ports:
+      # Map these ports to any available port number on the host
+      - "8888:8888"
