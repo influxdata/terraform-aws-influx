@@ -1,0 +1,108 @@
+#!/usr/bin/env bash
+
+set -e
+
+# Import the appropriate bash commons libraries
+readonly BASH_COMMONS_DIR="/opt/gruntwork/bash-commons"
+readonly SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
+
+readonly DEFAULT_CHRONOGRAF_VERSION="1.7.8"
+readonly DEFAULT_TEMP_CHRONOGRAF_CONFIG_FILE_PATH="/tmp/config/chronograf"
+readonly DEFAULT_CHRONOGRAF_CONFIG_FILE_PATH="/etc/default/chronograf"
+readonly DEFAULT_CHRONOGRAF_DIR="/opt/chronograf"
+readonly DEFAULT_CHRONOGRAF_BIN_DIR="$DEFAULT_CHRONOGRAF_DIR/bin"
+
+if [[ ! -d "$BASH_COMMONS_DIR" ]]; then
+  echo "ERROR: this script requires that bash-commons is installed in $BASH_COMMONS_DIR. See https://github.com/gruntwork-io/bash-commons for more info."
+  exit 1
+fi
+
+source "$BASH_COMMONS_DIR/assert.sh"
+source "$BASH_COMMONS_DIR/log.sh"
+source "$BASH_COMMONS_DIR/os.sh"
+
+function print_usage {
+  echo
+  echo "Usage: install-chronograf [options]"
+  echo
+  echo "This script can be used to install Chronograf and its dependencies. This script has been tested with Ubuntu 18.04 and Amazon Linux 2."
+  echo
+  echo "Options:"
+  echo
+  echo -e "  --version\t\tThe version of Chronograf to install. Default: $DEFAULT_CHRONOGRAF_VERSION."
+  echo -e "  --config-file\t\tPath to a custom configuration file. Default: $DEFAULT_TEMP_CHRONOGRAF_CONFIG_FILE_PATH"
+
+  echo
+  echo "Example:"
+  echo
+  echo "  install-chronograf --version $DEFAULT_CHRONOGRAF_VERSION --config-file $DEFAULT_TEMP_CHRONOGRAF_CONFIG_FILE_PATH"
+}
+
+function install_chronograf_on_ubuntu {
+  local -r version="$1"
+
+  log_info "Installing Chronograf"
+  wget "https://dl.influxdata.com/chronograf/releases/chronograf_${version}_amd64.deb"
+  sudo dpkg -i "chronograf_${version}_amd64.deb"
+}
+
+function install_chronograf_on_amazon_linux {
+  local -r version="$1"
+
+  log_info "Installing Chronograf"
+  wget "https://dl.influxdata.com/chronograf/releases/chronograf-${version}.x86_64.rpm"
+  sudo yum localinstall -y "chronograf-${version}.x86_64.rpm"
+}
+
+function install_chronograf {
+  local version="$DEFAULT_CHRONOGRAF_VERSION"
+  local config_file="$DEFAULT_TEMP_CHRONOGRAF_CONFIG_FILE_PATH"
+
+  while [[ $# > 0 ]]; do
+    local key="$1"
+
+    case "$key" in
+      --help)
+        print_usage
+        exit
+        ;;
+      --version)
+        assert_not_empty "$key" "$2"
+        version="$2"
+        shift
+        ;;
+      --config-file)
+        assert_not_empty "$key" "$2"
+        config_file="$2"
+        shift
+        ;;
+      *)
+        echo "Unrecognized argument: $key"
+        print_usage
+        exit 1
+        ;;
+    esac
+
+    shift
+  done
+
+  assert_is_installed "sudo"
+  assert_is_installed "wget"
+
+  if os_is_ubuntu "18.04"; then
+    install_chronograf_on_ubuntu "$version"
+  elif os_is_amazon_linux "2"; then
+    install_chronograf_on_amazon_linux "$version"
+  else
+    log_error "This script only supports Ubuntu 18.04 and Amazon Linux 2."
+    exit 1
+  fi
+
+  # Disable the installed systemd service to prevent it from starting up on boot.
+  # The 'run-chronograf' script will be used to start the service after properly configuring it
+  sudo systemctl disable chronograf.service
+
+  sudo mv "$config_file" "$DEFAULT_CHRONOGRAF_CONFIG_FILE_PATH"
+}
+
+install_chronograf "$@"
