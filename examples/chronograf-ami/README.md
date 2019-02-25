@@ -10,7 +10,7 @@ Images (AMIs)](http://docs.aws.amazon.com/AWSEC2/latest/UserGuide/AMIs.html) tha
 1. Amazon Linux 2
 
 Chronograf is usually installed as a collection agent on your application's EC2 instance(s).
-This Chronograf AMI is only useful for standing up Chronograf to pull remote data or accept data from a remote service,
+This Chronograf AMI is only useful for starting up Chronograf to pull remote data or accept data from a remote service,
 e.g. connecting to a queue like Kafka/PubSub or using it as a scraper to pull prometheus metrics.
 
 ## Quick start
