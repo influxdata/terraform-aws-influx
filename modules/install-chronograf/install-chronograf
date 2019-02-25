@@ -98,6 +98,10 @@ function install_chronograf {
     exit 1
   fi
 
+  # Disable the installed systemd service to prevent it from starting up on boot.
+  # The 'run-chronograf' script will be used to start the service after properly configuring it
+  sudo systemctl disable chronograf.service
+
   sudo mv "$config_file" "$DEFAULT_CHRONOGRAF_CONFIG_FILE_PATH"
 }
 
