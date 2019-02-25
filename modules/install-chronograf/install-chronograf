@@ -7,8 +7,8 @@ readonly BASH_COMMONS_DIR="/opt/gruntwork/bash-commons"
 readonly SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
 
 readonly DEFAULT_CHRONOGRAF_VERSION="1.7.8"
-readonly DEFAULT_TEMP_CHRONOGRAF_CONFIG_FILE_PATH="/tmp/config/chronograf.conf"
-readonly DEFAULT_CHRONOGRAF_CONFIG_FILE_PATH="/etc/default/chronograf.conf"
+readonly DEFAULT_TEMP_CHRONOGRAF_CONFIG_FILE_PATH="/tmp/config/chronograf"
+readonly DEFAULT_CHRONOGRAF_CONFIG_FILE_PATH="/etc/default/chronograf"
 readonly DEFAULT_CHRONOGRAF_DIR="/opt/chronograf"
 readonly DEFAULT_CHRONOGRAF_BIN_DIR="$DEFAULT_CHRONOGRAF_DIR/bin"
 
@@ -42,16 +42,16 @@ function install_chronograf_on_ubuntu {
   local -r version="$1"
 
   log_info "Installing Chronograf"
-  wget "https://dl.influxdata.com/chronograf/releases/chronograf_${version}-1_amd64.deb"
-  sudo dpkg -i "chronograf_${version}-1_amd64.deb"
+  wget "https://dl.influxdata.com/chronograf/releases/chronograf_${version}_amd64.deb"
+  sudo dpkg -i "chronograf_${version}_amd64.deb"
 }
 
 function install_chronograf_on_amazon_linux {
   local -r version="$1"
 
   log_info "Installing Chronograf"
-  wget "https://dl.influxdata.com/chronograf/releases/chronograf-${version}-1.x86_64.rpm"
-  sudo yum localinstall -y "chronograf-${version}-1.x86_64.rpm"
+  wget "https://dl.influxdata.com/chronograf/releases/chronograf-${version}.x86_64.rpm"
+  sudo yum localinstall -y "chronograf-${version}.x86_64.rpm"
 }
 
 function install_chronograf {
