@@ -8,7 +8,7 @@ resource "aws_instance" "chronograf_server" {
   user_data              = "${var.user_data}"
   key_name               = "${var.ssh_key_name}"
   vpc_security_group_ids = ["${aws_security_group.chronograf_security_group.id}"]
-  tags                   = "${var.tags}"
+  tags                   = "${merge(map("Name", "${var.server_name}"), var.tags)}"
 }
 
 # ---------------------------------------------------------------------------------------------------------------------
@@ -17,7 +17,7 @@ resource "aws_instance" "chronograf_server" {
 # ---------------------------------------------------------------------------------------------------------------------
 
 resource "aws_security_group" "chronograf_security_group" {
-  name_prefix = "chronograf"
+  name_prefix = "${var.server_name}-"
   description = "Security group for the Chronograf server"
   vpc_id      = "${var.vpc_id}"
 }

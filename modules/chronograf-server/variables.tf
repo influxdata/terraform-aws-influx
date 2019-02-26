@@ -3,6 +3,10 @@
 # You must provide a value for each of these parameters.
 # ---------------------------------------------------------------------------------------------------------------------
 
+variable "server_name" {
+  description = "The name of the Chronograf server. This variable is used to namespace all resources created by this module."
+}
+
 variable "ami_id" {
   description = "The ID of the AMI to run in this cluster."
 }
