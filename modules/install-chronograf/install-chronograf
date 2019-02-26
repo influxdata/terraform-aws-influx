@@ -54,6 +54,17 @@ function install_chronograf_on_amazon_linux {
   sudo yum localinstall -y "chronograf-${version}.x86_64.rpm"
 }
 
+function install_chronograf_scripts {
+  local -r dest_dir="$1"
+
+  local -r run_chronograf_src="$SCRIPT_DIR/../run-chronograf/run-chronograf"
+  local -r run_chronograf_dest="$dest_dir/run-chronograf"
+
+  log_info "Copying $run_chronograf_src to $run_chronograf_dest"
+  sudo mkdir -p "$dest_dir"
+  sudo cp "$run_chronograf_src" "$run_chronograf_dest"
+}
+
 function install_chronograf {
   local version="$DEFAULT_CHRONOGRAF_VERSION"
   local config_file="$DEFAULT_TEMP_CHRONOGRAF_CONFIG_FILE_PATH"
@@ -103,6 +114,7 @@ function install_chronograf {
   sudo systemctl disable chronograf.service
 
   sudo mv "$config_file" "$DEFAULT_CHRONOGRAF_CONFIG_FILE_PATH"
+  install_chronograf_scripts "$DEFAULT_CHRONOGRAF_BIN_DIR"
 }
 
 install_chronograf "$@"

@@ -18,6 +18,7 @@ services:
       # Mount these scripts so we get hot reload
       - ../../../modules/run-telegraf/run-telegraf:/opt/telegraf/bin/run-telegraf
       - ../../../modules/run-influxdb/run-influxdb:/opt/influxdb/bin/run-influxdb
+      - ../../../modules/run-chronograf/run-chronograf:/opt/chronograf/bin/run-chronograf
       - ../../../modules/influxdb-commons:/opt/influxdb-commons
 
       # Override scripts with mocks so we can run locally, without talking to AWS APIs
@@ -46,7 +47,10 @@ services:
       USER_DATA_ENV_volume_owner: influxdb
       USER_DATA_ENV_influxdb_url: http://localhost:8086
       USER_DATA_ENV_database_name: telegraf
+      USER_DATA_ENV_host: 0.0.0.0
+      USER_DATA_ENV_port: 8888
     
     ports:
       # Map these ports to any available port number on the host
       - "8086:8086"
+      - "8888:8888"

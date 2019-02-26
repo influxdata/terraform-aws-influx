@@ -70,6 +70,15 @@ function run_telegraf {
     --auto-fill "<__DATABASE_NAME__>=$database_name"
 }
 
+function run_chronograf {
+  local -r host="$1"
+  local -r port="$2"
+
+  "/opt/chronograf/bin/run-chronograf" \
+    --auto-fill "<__HOST__>=$host" \
+    --auto-fill "<__PORT__>=$port"
+}
+
 run_influxdb \
   "${cluster_asg_name}" \
   "${aws_region}" \
@@ -82,3 +91,7 @@ run_influxdb \
 run_telegraf \
   "${influxdb_url}" \
   "${database_name}"
+
+run_chronograf \
+  "${host}" \
+  "${port}"
