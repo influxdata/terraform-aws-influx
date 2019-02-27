@@ -55,7 +55,7 @@ fully-working sample code.
 
 ## How do you connect to the Chronograf server?
 
-Once deployed you an simply access the web UI by visiting the http://<public-ip>:<port>, you can get the `public_ip` by running:
+Once deployed you can simply access the web UI by visiting the http://<public-ip>:<port>, you can get the `public_ip` by running:
 
 ```bash
 $ terraform output public_ip
