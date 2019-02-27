@@ -55,13 +55,16 @@ fully-working sample code.
 
 ## How do you connect to the Chronograf server?
 
-Once deployed you an simply access the web UI by visiting the public IP of the server on the specified port.
+Once deployed you can simply access the web UI by visiting the http://<public-ip>:<port>, you can get the `public_ip` by running:
+
+```bash
+$ terraform output public_ip
+```
 
 ## What's included in this module?
 
 This module creates the following:
 
-* [Auto Scaling Group](#auto-scaling-group)
 * [Security Group](#security-group)
 
 ### Security Group
