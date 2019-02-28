@@ -9,6 +9,7 @@ import (
 	"github.com/gruntwork-io/terratest/modules/logger"
 	"github.com/gruntwork-io/terratest/modules/retry"
 
+	http_helper "github.com/gruntwork-io/terratest/modules/http-helper"
 	"github.com/gruntwork-io/terratest/modules/packer"
 	client "github.com/influxdata/influxdb/client/v2"
 	"github.com/stretchr/testify/assert"
@@ -110,4 +111,38 @@ func validateInfluxdb(t *testing.T, endpoint string, port string) {
 
 	returnedValue, _ := series.Values[0][2].(json.Number).Int64()
 	assert.Equal(t, value, returnedValue)
+}
+
+func validateTelegraf(t *testing.T, endpoint string, port string, databaseName string) {
+	c, err := client.NewHTTPClient(client.HTTPConfig{
+		Addr:    fmt.Sprintf("http://%s:%s", endpoint, port),
+		Timeout: time.Second * 60,
+	})
+
+	require.NoError(t, err, "Unable to connect to InfluxDB endpoint")
+
+	defer c.Close()
+
+	// Read from database
+	response, err := c.Query(client.Query{
+		Command:  "SELECT * FROM cpu",
+		Database: databaseName,
+	})
+
+	require.NoError(t, err, "Unable to read from database")
+	require.NoError(t, response.Error(), "Query failed")
+
+	assert.NotEmpty(t, response.Results)
+}
+
+func validateChronograf(t *testing.T, endpoint string, port string) {
+	maxRetries := 30
+	sleepBetweenRetries := 4 * time.Second
+	url := fmt.Sprintf("http://%s:%s", endpoint, port)
+
+	logger.Log(t, "Checking URL: %s", url)
+
+	http_helper.HttpGetWithRetryWithCustomValidation(t, url, maxRetries, sleepBetweenRetries, func(status int, body string) bool {
+		return status == 200
+	})
 }
