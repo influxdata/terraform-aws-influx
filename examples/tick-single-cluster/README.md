@@ -14,7 +14,7 @@ example](https://github.com/gruntwork-io/terraform-aws-influx/tree/master/exampl
 To see an example of TICK deployed across separate clusters, see the [tick-multi-cluster
 example](https://github.com/gruntwork-io/terraform-aws-influx/blob/master/examples/tick-multi-cluster).
 
-## What resources are does this example deploy?
+## What resources does this example deploy?
 
 1. A single _all in one server_ behind an ASG where we run 
     [telegraf](/modules/run-telegraf), [influxdb](/modules/run-influxdb),
