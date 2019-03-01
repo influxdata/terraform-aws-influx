@@ -22,7 +22,7 @@ example](https://github.com/gruntwork-io/terraform-aws-influx/blob/master/exampl
 1. An [Application Load Balancer](https://github.com/gruntwork-io/module-load-balancer)
 
 You will need to create [Amazon Machine Images (AMIs)](http://docs.aws.amazon.com/AWSEC2/latest/UserGuide/AMIs.html) 
-that have all of the ELK components installed. You can do this using: 
+that have all of the TICK-stack components installed. You can do this using: 
 - [TICK all-in-one AMI example](/examples/tick-ami)
 
 ## Quick start
