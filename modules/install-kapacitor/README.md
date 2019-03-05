@@ -1,7 +1,7 @@
 # Kapacitor Install Script
 
 Kapacitor is a Real-Time Streaming Data Processing Engine.
-This folder contains a script for installing Kapacitor Enterprise and its dependencies.
+This folder contains a script for installing Kapacitor and its dependencies.
 
 This script has been tested on the following operating systems:
 
@@ -26,7 +26,7 @@ gruntwork-install \
 
 Checkout the [releases](https://github.com/gruntwork-io/terraform-aws-influx/releases) to find the latest version.
 
-The `install-kapacitor` script will install the Kapacitor Enterprise binary as well as its dependencies.
+The `install-kapacitor` script will install the Kapacitor binary as well as its dependencies.
 
 We recommend running the `install-kapacitor` script as part of a [Packer](https://www.packer.io/) template to 
 create a Kapacitor [Amazon Machine Image (AMI)](http://docs.aws.amazon.com/AWSEC2/latest/UserGuide/AMIs.html).
@@ -42,7 +42,7 @@ Run `install-kapacitor --help` to see all available arguments.
 ```
 Usage: install-kapacitor [options]
 
-This script can be used to install Kapacitor Enterprise and its dependencies. This script has been tested with Ubuntu 18.04 and Amazon Linux 2.
+This script can be used to install Kapacitor and its dependencies. This script has been tested with Ubuntu 18.04 and Amazon Linux 2.
 
 Options:
 
@@ -60,5 +60,5 @@ Example:
 
 The `install-kapacitor` script does the following:
 
-1. Installs the Kapacitor Enterprise binary
+1. Installs the Kapacitor binary
 1. Replaces the default Kapatictor config file with your custom config file.
