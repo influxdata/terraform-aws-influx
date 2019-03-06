@@ -1,0 +1,111 @@
+{
+  "min_packer_version": "0.12.0",
+  "variables": {
+    "aws_region": "us-east-1",
+    "base_ami_name": "kapacitor",
+    "version": "1.5.2"
+  },
+  "builders": [{
+    "name": "kapacitor-ami-ubuntu",
+    "ami_name": "{{user `base_ami_name`}}-ubuntu-example-{{uuid | clean_ami_name}}",
+    "ami_description": "An Ubuntu 18.04 AMI that has Kapacitor installed.",
+    "instance_type": "t2.micro",
+    "region": "{{user `aws_region`}}",
+    "type": "amazon-ebs",
+    "source_ami_filter": {
+      "filters": {
+        "virtualization-type": "hvm",
+        "architecture": "x86_64",
+        "name": "*ubuntu-bionic-18.04-amd64-server-*",
+        "block-device-mapping.volume-type": "gp2",
+        "root-device-type": "ebs"
+      },
+      "owners": ["099720109477"],
+      "most_recent": true
+    },
+    "ssh_username": "ubuntu"
+  },{
+    "name": "kapacitor-ami-amazon-linux",
+    "ami_name": "{{user `base_ami_name`}}-amazon-linux-example-{{uuid | clean_ami_name}}",
+    "ami_description": "An Amazon Linux 2 AMI that has Kapacitor installed.",
+    "instance_type": "t2.micro",
+    "region": "{{user `aws_region`}}",
+    "type": "amazon-ebs",
+    "source_ami_filter": {
+      "filters": {
+        "virtualization-type": "hvm",
+        "architecture": "x86_64",
+        "name": "amzn2-ami-hvm-*-x86_64-gp2",
+        "block-device-mapping.volume-type": "gp2",
+        "root-device-type": "ebs"
+      },
+      "owners": ["amazon"],
+      "most_recent": true
+    },
+    "ssh_username": "ec2-user"
+  },{
+    "name": "kapacitor-docker-ubuntu",
+    "type": "docker",
+    "image": "ubuntu:18.04",
+    "commit": "true"
+  },{
+    "name": "kapacitor-docker-amazon-linux",
+    "type": "docker",
+    "image": "amazonlinux:2",
+    "commit": "true"
+  }],
+  "provisioners": [{
+    "type": "shell",
+    "inline": [
+      "sudo yum update -y",
+      "sudo yum install -y git"
+    ],
+    "only": ["kapacitor-ami-amazon-linux"]
+  },{
+    "type": "shell",
+    "inline": [
+      "DEBIAN_FRONTEND=noninteractive apt-get update -y",
+      "apt-get install -y sudo wget git systemd"
+    ],
+    "only": ["kapacitor-docker-ubuntu"]
+  },{
+    "type": "shell",
+    "inline": [
+      "yum update -y",
+      "yum install -y sudo wget git"
+    ],
+    "only": ["kapacitor-docker-amazon-linux"]
+  },{
+    "type": "shell",
+    "inline": [
+      "sudo mkdir -p /opt/gruntwork",
+      "git clone --branch v0.1.0 https://github.com/gruntwork-io/bash-commons.git /tmp/bash-commons",
+      "sudo cp -r /tmp/bash-commons/modules/bash-commons/src /opt/gruntwork/bash-commons",
+      "mkdir -p /tmp/terraform-aws-influx/modules"
+    ]
+  },{
+    "type": "file",
+    "source": "{{template_dir}}/config",
+    "destination": "/tmp"
+  },{
+    "type": "file",
+    "source": "{{template_dir}}/../../modules/",
+    "destination": "/tmp/terraform-aws-influx/modules"
+  },{
+    "type": "shell",
+    "inline": [
+      "/tmp/terraform-aws-influx/modules/install-kapacitor/install-kapacitor --version {{user `version`}}"
+    ]
+  }],
+  "post-processors": [{
+    "type": "docker-tag",
+    "repository": "gruntwork/kapacitor-ubuntu",
+    "tag": "latest",
+    "only": ["kapacitor-docker-ubuntu"]
+  },{
+    "type": "docker-tag",
+    "repository": "gruntwork/kapacitor-amazon-linux",
+    "tag": "latest",
+    "only": ["kapacitor-docker-amazon-linux"]
+  }]
+}
