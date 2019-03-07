@@ -38,6 +38,17 @@ function print_usage {
   echo "  install-kapacitor --version $DEFAULT_KAPACITOR_VERSION --config-file $DEFAULT_TEMP_KAPACITOR_CONFIG_FILE_PATH"
 }
 
+function install_kapacitor_scripts {
+  local -r dest_dir="$1"
+
+  local -r run_kapacitor_src="$SCRIPT_DIR/../run-kapacitor/run-kapacitor"
+  local -r run_kapacitor_dest="$dest_dir/run-kapacitor"
+
+  log_info "Copying $run_kapacitor_src to $run_kapacitor_dest"
+  sudo mkdir -p "$dest_dir"
+  sudo cp "$run_kapacitor_src" "$run_kapacitor_dest"
+}
+
 function install_kapacitor_on_ubuntu {
   local -r version="$1"
 
@@ -103,6 +114,7 @@ function install_kapacitor {
   sudo systemctl disable kapacitor.service
 
   sudo mv "$config_file" "$DEFAULT_KAPACITOR_CONFIG_FILE_PATH"
+  install_kapacitor_scripts "$DEFAULT_KAPACITOR_BIN_DIR"
 }
 
 install_kapacitor "$@"
