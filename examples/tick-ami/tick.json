@@ -5,7 +5,8 @@
     "base_ami_name": "tick",
     "telegraf_version": "1.9.4",
     "influxdb_version": "1.6.2",
-    "chronograf_version": "1.7.8"
+    "chronograf_version": "1.7.8",
+    "kapacitor_version": "1.5.2"
   },
   "builders": [{
     "name": "tick-ami-ubuntu",
@@ -113,6 +114,10 @@
     "destination": "/tmp/config/chronograf"
   },{
     "type": "file",
+    "source": "{{template_dir}}/../kapacitor-ami/config/kapacitor.conf",
+    "destination": "/tmp/config/kapacitor.conf"
+  },{
+    "type": "file",
     "source": "{{template_dir}}/../../modules/",
     "destination": "/tmp/terraform-aws-influx/modules"
   },{
@@ -120,7 +125,8 @@
     "inline": [
       "/tmp/terraform-aws-influx/modules/install-telegraf/install-telegraf --version {{user `telegraf_version`}}",
       "/tmp/terraform-aws-influx/modules/install-influxdb/install-influxdb --version {{user `influxdb_version`}}",
-      "/tmp/terraform-aws-influx/modules/install-chronograf/install-chronograf --version {{user `chronograf_version`}}"
+      "/tmp/terraform-aws-influx/modules/install-chronograf/install-chronograf --version {{user `chronograf_version`}}",
+      "/tmp/terraform-aws-influx/modules/install-kapacitor/install-kapacitor --version {{user `kapacitor_version`}}"
     ]
   }],
   "post-processors": [{
