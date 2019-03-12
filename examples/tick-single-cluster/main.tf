@@ -29,7 +29,12 @@ module "tick" {
 
   ebs_block_devices = [
     {
-      device_name = "${var.volume_device_name}"
+      device_name = "${var.influxdb_volume_device_name}"
+      volume_type = "gp2"
+      volume_size = 50
+    },
+    {
+      device_name = "${var.kapacitor_volume_device_name}"
       volume_type = "gp2"
       volume_size = 50
     },
@@ -75,9 +80,9 @@ data "template_file" "user_data_tick" {
     shared_secret    = "${var.shared_secret}"
 
     # Pass in the data about the EBS volumes so they can be mounted
-    volume_device_name = "${var.volume_device_name}"
-    volume_mount_point = "${var.volume_mount_point}"
-    volume_owner       = "${var.volume_owner}"
+    influxdb_volume_device_name = "${var.influxdb_volume_device_name}"
+    influxdb_volume_mount_point = "${var.influxdb_volume_mount_point}"
+    influxdb_volume_owner       = "${var.influxdb_volume_owner}"
 
     # Telegraf
     influxdb_url  = "http://localhost:8086"
@@ -86,6 +91,12 @@ data "template_file" "user_data_tick" {
     # Chronograf
     host = "0.0.0.0"
     port = "8888"
+
+    # Kapacitor
+    hostname                     = "localhost"
+    kapacitor_volume_device_name = "${var.kapacitor_volume_device_name}"
+    kapacitor_volume_mount_point = "${var.kapacitor_volume_mount_point}"
+    kapacitor_volume_owner       = "${var.kapacitor_volume_owner}"
   }
 }
 
