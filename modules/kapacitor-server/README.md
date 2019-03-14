@@ -1,4 +1,4 @@
-# Kapacitor Cluster
+# Kapacitor Server
 
 This folder contains a [Terraform](https://www.terraform.io/) module to deploy an [Kapacitor Enterprise](
 https://www.influxdata.com/time-series-platform/kapacitor/) cluster in [AWS](https://aws.amazon.com/) on top of an Auto Scaling Group. 
@@ -53,12 +53,6 @@ You can find the other parameters in [variables.tf](variables.tf).
 Check out the [examples folder](https://github.com/gruntwork-io/terraform-aws-influx/tree/master/examples) for 
 fully-working sample code.
 
-## Why Kapacitor Enterprise?
-
-The Enterprise edition of Kapacitor is the only flavor that supports deployment across multiple nodes in a luster. The OSS edition
-is distributed as a single binary to be installed on a single instance. This makes a robust module like this one only useful for
-the cluster deployment capacilities of the enterprise edition.
-
 ## What's included in this module?
 
 This module creates the following:
@@ -69,17 +63,15 @@ This module creates the following:
 
 ### Auto Scaling Group
 
-This module runs Kapacitor on top of an [Auto Scaling Group (ASG)](https://aws.amazon.com/autoscaling/). Typically, you
-should run the ASG with multiple Instances spread across multiple [Availability 
-Zones](http://docs.aws.amazon.com/AWSEC2/latest/UserGuide/using-regions-availability-zones.html). Each of the EC2
-Instances should be running an AMI that has Kapacitor installed via the 
+This module runs a single Kapacitor node on top of an [Auto Scaling Group (ASG)](https://aws.amazon.com/autoscaling/) to allow for auto-recovery. The EC2
+Instance should be running an AMI that has Kapacitor installed via the 
 [install-kapacitor](https://github.com/gruntwork-io/terraform-aws-influx/tree/master/modules/install-kapacitor)
 module. You pass in the ID of the AMI to run using the `ami_id` input parameter.
 
 
 ### Security Group
 
-Each EC2 Instance in the ASG has a Security Group that allows minimal connectivity:
+The EC2 Instance in the ASG has a Security Group that allows minimal connectivity:
 
 * All outbound requests
 * Inbound SSH access from the CIDR blocks and security groups you specify
@@ -90,7 +82,7 @@ module to open up all the ports necessary for Kapacitor.
 
 ### IAM Role and Permissions
 
-Each EC2 Instance in the ASG has an [IAM Role](http://docs.aws.amazon.com/IAM/latest/UserGuide/id_roles.html) attached. 
+The EC2 Instance in the ASG has an [IAM Role](http://docs.aws.amazon.com/IAM/latest/UserGuide/id_roles.html) attached. 
 The IAM Role ARN and ID are exported as output variables if you need to add additional permissions.
 
 ### How do you roll out updates?
