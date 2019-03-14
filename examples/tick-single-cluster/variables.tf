@@ -66,7 +66,7 @@ variable "influxdb_volume_owner" {
 
 variable "kapacitor_volume_device_name" {
   description = "The device name to use for the EBS Volume used for the Kapcitor node."
-  default     = "/dev/xvdh"
+  default     = "/dev/xvdi"
 }
 
 variable "kapacitor_volume_mount_point" {
@@ -78,4 +78,3 @@ variable "kapacitor_volume_owner" {
   description = "The OS user who should be made the owner of mount points."
   default     = "kapacitor"
 }
-

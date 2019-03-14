@@ -142,6 +142,21 @@ module "chronograf_security_group_rules" {
   http_port_cidr_blocks = ["0.0.0.0/0"]
 }
 
+module "kapacitor_security_group_rules" {
+  # When using these modules in your own code, you will need to use a Git URL with a ref attribute that pins you
+  # to a specific version of the modules, such as the following example:
+  # source = "git::git@github.com:gruntwork-io/terraform-aws-influx.git//modules/chronograf-security-group-rules?ref=v0.0.1"
+  source = "../../modules/kapacitor-security-group-rules"
+
+  security_group_id = "${module.tick.security_group_id}"
+
+  http_port = 9092
+
+  # To keep this example simple, we allow these ports to be accessed from any IP. In a production
+  # deployment, you may want to lock these down just to trusted servers.
+  http_port_cidr_blocks = ["0.0.0.0/0"]
+}
+
 # ---------------------------------------------------------------------------------------------------------------------
 # ATTACH IAM POLICIES TO EACH CLUSTER
 # These policies allow the clusters to automatically bootstrap themselves
@@ -170,7 +185,7 @@ module "load_balancer" {
   vpc_id     = "${data.aws_vpc.default.id}"
   subnet_ids = "${data.aws_subnet_ids.default.ids}"
 
-  http_listener_ports = [8086, 8888]
+  http_listener_ports = [8086, 8888, 9092]
 
   # To make testing easier, we allow inbound connections from any IP. In production usage, you may want to only allow
   # connectsion from certain trusted servers, or even use an internal load balancer, so it's only accessible from
@@ -212,6 +227,24 @@ module "chronograf_target_group" {
   vpc_id               = "${data.aws_vpc.default.id}"
 
   listener_arns                   = ["${lookup(module.load_balancer.http_listener_arns, 8888)}"]
+  listener_arns_num               = 1
+  listener_rule_starting_priority = 100
+}
+
+module "kapacitor_target_group" {
+  # When using these modules in your own code, you will need to use a Git URL with a ref attribute that pins you
+  # to a specific version of the modules, such as the following example:
+  # source = "git::git@github.com:gruntwork-io/terraform-aws-influx.git//modules/load-balancer-target-group?ref=v0.0.1"
+  source = "../../modules/load-balancer-target-group"
+
+  target_group_name    = "${var.cluster_name}-ktg"
+  asg_name             = "${module.tick.asg_name}"
+  port                 = "${module.kapacitor_security_group_rules.http_port}"
+  health_check_path    = "/kapacitor/v1/ping"
+  health_check_matcher = "204"
+  vpc_id               = "${data.aws_vpc.default.id}"
+
+  listener_arns                   = ["${lookup(module.load_balancer.http_listener_arns, 9092)}"]
   listener_arns_num               = 1
   listener_rule_starting_priority = 100
 }
