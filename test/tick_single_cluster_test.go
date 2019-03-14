@@ -26,6 +26,7 @@ func TestTickSingleCluster(t *testing.T) {
 	// os.Setenv("SKIP_validate_influxdb", "true")
 	// os.Setenv("SKIP_validate_telegraf", "true")
 	// os.Setenv("SKIP_validate_chronograf", "true")
+	// os.Setenv("SKIP_validate_kapacitor", "true")
 	// os.Setenv("SKIP_teardown", "true")
 
 	var testcases = []struct {
@@ -126,6 +127,13 @@ func TestTickSingleCluster(t *testing.T) {
 				endpoint := terraform.Output(t, terraformOptions, "lb_dns_name")
 				port := terraform.Output(t, terraformOptions, "chronograf_port")
 				validateChronograf(t, endpoint, port)
+			})
+
+			test_structure.RunTestStage(t, "validate_kapacitor", func() {
+				terraformOptions := test_structure.LoadTerraformOptions(t, examplesDir)
+				endpoint := terraform.Output(t, terraformOptions, "lb_dns_name")
+				port := terraform.Output(t, terraformOptions, "kapacitor_port")
+				validateKapacitor(t, endpoint, port)
 			})
 		})
 	}
