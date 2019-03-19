@@ -49,18 +49,32 @@ variable "ssh_key_name" {
   default     = ""
 }
 
-variable "volume_device_name" {
+variable "influxdb_volume_device_name" {
   description = "The device name to use for the EBS Volume used for the meta, data, wal and hh directories on InfluxDB nodes."
   default     = "/dev/xvdh"
 }
 
-variable "volume_mount_point" {
+variable "influxdb_volume_mount_point" {
   description = "The mount point (folder path) to use for the EBS Volume used for the meta, data, wal and hh directories on InfluxDB data nodes."
   default     = "/influxdb"
 }
 
-variable "volume_owner" {
+variable "influxdb_volume_owner" {
   description = "The OS user who should be made the owner of mount points."
   default     = "influxdb"
 }
 
+variable "kapacitor_volume_device_name" {
+  description = "The device name to use for the EBS Volume used for the Kapcitor node."
+  default     = "/dev/xvdi"
+}
+
+variable "kapacitor_volume_mount_point" {
+  description = "The mount point (folder path) to use for the EBS Volume used for Kapacitor data directory."
+  default     = "/kapacitor"
+}
+
+variable "kapacitor_volume_owner" {
+  description = "The OS user who should be made the owner of mount points."
+  default     = "kapacitor"
+}

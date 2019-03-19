@@ -1,4 +1,3 @@
-
 output "cluster_asg_name" {
   value = "${module.tick.asg_name}"
 }
@@ -13,4 +12,8 @@ output "influxdb_port" {
 
 output "chronograf_port" {
   value = "${module.chronograf_security_group_rules.http_port}"
+}
+
+output "kapacitor_port" {
+  value = "${module.kapacitor_security_group_rules.http_port}"
 }

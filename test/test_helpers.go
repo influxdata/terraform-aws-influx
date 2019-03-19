@@ -146,3 +146,15 @@ func validateChronograf(t *testing.T, endpoint string, port string) {
 		return status == 200
 	})
 }
+
+func validateKapacitor(t *testing.T, endpoint string, port string) {
+	maxRetries := 30
+	sleepBetweenRetries := 4 * time.Second
+	url := fmt.Sprintf("http://%s:%s/kapacitor/v1/ping", endpoint, port)
+
+	logger.Log(t, "Checking URL: %s", url)
+
+	http_helper.HttpGetWithRetryWithCustomValidation(t, url, maxRetries, sleepBetweenRetries, func(status int, body string) bool {
+		return status == 204
+	})
+}

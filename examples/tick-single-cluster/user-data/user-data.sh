@@ -70,6 +70,21 @@ function run_telegraf {
     --auto-fill "<__DATABASE_NAME__>=$database_name"
 }
 
+function run_kapacitor {
+  local -r hostname="$1"
+  local -r influxdb_url="$2"
+  local -r volume_device_name="$3"
+  local -r volume_mount_point="$4"
+  local -r volume_owner="$5"
+
+  mount_volumes "$volume_device_name" "$volume_mount_point" "$volume_owner"
+
+  "/opt/kapacitor/bin/run-kapacitor" \
+    --auto-fill "<__HOST_NAME__>=$hostname" \
+    --auto-fill "<__STORAGE_DIR__>=$volume_mount_point" \
+    --auto-fill "<__INFLUXDB_URL__>=$influxdb_url"
+}
+
 function run_chronograf {
   local -r host="$1"
   local -r port="$2"
@@ -84,13 +99,20 @@ run_influxdb \
   "${aws_region}" \
   "${license_key}" \
   "${shared_secret}" \
-  "${volume_device_name}" \
-  "${volume_mount_point}" \
-  "${volume_owner}"
+  "${influxdb_volume_device_name}" \
+  "${influxdb_volume_mount_point}" \
+  "${influxdb_volume_owner}"
 
 run_telegraf \
   "${influxdb_url}" \
   "${database_name}"
+
+run_kapacitor \
+  "${hostname}" \
+  "${influxdb_url}" \
+  "${kapacitor_volume_device_name}" \
+  "${kapacitor_volume_mount_point}" \
+  "${kapacitor_volume_owner}"
 
 run_chronograf \
   "${host}" \

@@ -42,10 +42,14 @@ services:
       USER_DATA_ENV_license_key: ${LICENSE_KEY}
       USER_DATA_ENV_shared_secret: ${SHARED_SECRET}
       USER_DATA_ENV_data_node_container_base_name: ${CONTAINER_BASE_NAME}
-      USER_DATA_ENV_volume_device_name: /dev/xvdf
-      USER_DATA_ENV_volume_mount_point: /influxdb
-      USER_DATA_ENV_volume_owner: influxdb
+      USER_DATA_ENV_influxdb_volume_device_name: /dev/xvdf
+      USER_DATA_ENV_influxdb_volume_mount_point: /influxdb
+      USER_DATA_ENV_influxdb_volume_owner: influxdb
+      USER_DATA_ENV_kapacitor_volume_device_name: /dev/xvdf
+      USER_DATA_ENV_kapacitor_volume_mount_point: /kapacitor
+      USER_DATA_ENV_kapacitor_volume_owner: kapacitor
       USER_DATA_ENV_influxdb_url: http://localhost:8086
+      USER_DATA_ENV_hostname: localhost
       USER_DATA_ENV_database_name: telegraf
       USER_DATA_ENV_host: 0.0.0.0
       USER_DATA_ENV_port: 8888
@@ -54,3 +58,4 @@ services:
       # Map these ports to any available port number on the host
       - "8086:8086"
       - "8888:8888"
+      - "9092:9092"
