@@ -145,7 +145,7 @@ module "chronograf_security_group_rules" {
 module "kapacitor_security_group_rules" {
   # When using these modules in your own code, you will need to use a Git URL with a ref attribute that pins you
   # to a specific version of the modules, such as the following example:
-  # source = "git::git@github.com:gruntwork-io/terraform-aws-influx.git//modules/chronograf-security-group-rules?ref=v0.0.1"
+  # source = "git::git@github.com:gruntwork-io/terraform-aws-influx.git//modules/kapacitor-security-group-rules?ref=v0.0.1"
   source = "../../modules/kapacitor-security-group-rules"
 
   security_group_id = "${module.tick.security_group_id}"
