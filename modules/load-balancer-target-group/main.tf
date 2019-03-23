@@ -38,7 +38,7 @@ resource "aws_alb_listener_rule" "http_path" {
     type             = "forward"
   }
 
-  condition = "${var.routing_condition}"
+  condition = ["${var.routing_condition}"]
 }
 
 # ---------------------------------------------------------------------------------------------------------------------
