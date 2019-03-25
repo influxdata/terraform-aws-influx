@@ -78,3 +78,16 @@ workflows:
               only: /^v.*/
             branches:
               ignore: /.*/
+
+  nightly:
+    triggers:
+      - schedule:
+          cron: "0 6 * * *"
+          filters:
+            branches:
+              only: master
+    jobs:
+      - install_dependencies
+      - test:
+          requires:
+            - install_dependencies
