@@ -61,7 +61,7 @@ variable "termination_policies" {
 }
 
 variable "associate_public_ip_address" {
-  description = "If set to true, associate a public IP address with each EC2 Instance in the cluster."
+  description = "If set to true, associate a public IP address with each EC2 Instance in the auto scaling group."
   default     = false
 }
 
