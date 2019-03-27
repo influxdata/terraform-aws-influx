@@ -8,8 +8,8 @@ resource "aws_autoscaling_group" "autoscaling_group" {
   launch_configuration = "${aws_launch_configuration.launch_configuration.name}"
   vpc_zone_identifier  = ["${var.subnet_ids}"]
 
-  min_size             = "1"
-  max_size             = "1"
+  min_size             = 1
+  max_size             = 1
   termination_policies = ["${var.termination_policies}"]
 
   health_check_type         = "${var.health_check_type}"
