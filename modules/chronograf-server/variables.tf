@@ -56,7 +56,7 @@ variable "allowed_ssh_security_group_ids_num" {
 }
 
 variable "termination_policies" {
-  description = "A list of policies to decide how the instances in the auto scale group should be terminated. The allowed values are OldestInstance, NewestInstance, OldestLaunchConfiguration, ClosestToNextInstanceHour, Default."
+  description = "A list of policies to decide how the instances in the auto scaling group should be terminated. The allowed values are OldestInstance, NewestInstance, OldestLaunchConfiguration, ClosestToNextInstanceHour, Default."
   default     = "Default"
 }
 
