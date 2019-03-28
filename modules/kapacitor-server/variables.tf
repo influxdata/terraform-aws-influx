@@ -3,7 +3,7 @@
 # You must provide a value for each of these parameters.
 # ---------------------------------------------------------------------------------------------------------------------
 
-variable "server_name" {
+variable "cluster_name" {
   description = "The name of the Kapacitor server (e.g. kapacitor-stage). This variable is used to namespace all resources created by this module."
 }
 

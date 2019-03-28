@@ -90,7 +90,7 @@
       "sudo mkdir -p /opt/gruntwork",
       "git clone --branch v0.0.7 https://github.com/gruntwork-io/bash-commons.git /tmp/bash-commons",
       "sudo cp -r /tmp/bash-commons/modules/bash-commons/src /opt/gruntwork/bash-commons",
-      "mkdir -p /tmp/terraform-aws-influx"
+      "mkdir -p /tmp/terraform-aws-influx/modules"
     ]
   },{
     "type": "file",
@@ -98,8 +98,8 @@
     "destination": "/tmp"
   },{
     "type": "file",
-    "source": "{{template_dir}}/../../",
-    "destination": "/tmp/terraform-aws-influx"
+    "source": "{{template_dir}}/../../modules/",
+    "destination": "/tmp/terraform-aws-influx/modules"
   },{
     "type": "shell",
     "inline": [
