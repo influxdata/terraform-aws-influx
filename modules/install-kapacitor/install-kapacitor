@@ -12,6 +12,9 @@ readonly DEFAULT_KAPACITOR_CONFIG_FILE_PATH="/etc/kapacitor/kapacitor.conf"
 readonly DEFAULT_KAPACITOR_DIR="/opt/kapacitor"
 readonly DEFAULT_KAPACITOR_BIN_DIR="$DEFAULT_KAPACITOR_DIR/bin"
 
+readonly INFLUXDB_COMMONS_SRC_DIR="$SCRIPT_DIR/../influxdb-commons"
+readonly INFLUXDB_COMMONS_INSTALL_DIR="/opt/influxdb-commons"
+
 if [[ ! -d "$BASH_COMMONS_DIR" ]]; then
   echo "ERROR: this script requires that bash-commons is installed in $BASH_COMMONS_DIR. See https://github.com/gruntwork-io/bash-commons for more info."
   exit 1
@@ -47,6 +50,14 @@ function install_kapacitor_scripts {
   log_info "Copying $run_kapacitor_src to $run_kapacitor_dest"
   sudo mkdir -p "$dest_dir"
   sudo cp "$run_kapacitor_src" "$run_kapacitor_dest"
+}
+
+function install_influxdb_commons {
+  local -r src_dir="$1"
+  local -r dest_dir="$2"
+
+  log_info "Copying $src_dir to $dest_dir"
+  sudo cp -r "$src_dir" "$dest_dir"
 }
 
 function install_kapacitor_on_ubuntu {
@@ -115,6 +126,7 @@ function install_kapacitor {
 
   sudo mv "$config_file" "$DEFAULT_KAPACITOR_CONFIG_FILE_PATH"
   install_kapacitor_scripts "$DEFAULT_KAPACITOR_BIN_DIR"
+  install_influxdb_commons "$INFLUXDB_COMMONS_SRC_DIR" "$INFLUXDB_COMMONS_INSTALL_DIR"
 }
 
 install_kapacitor "$@"
