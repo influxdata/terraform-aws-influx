@@ -3,7 +3,7 @@
 # ---------------------------------------------------------------------------------------------------------------------
 
 resource "aws_autoscaling_group" "autoscaling_group" {
-  name = "${var.server_name}"
+  name = "${var.cluster_name}"
 
   launch_configuration = "${aws_launch_configuration.launch_configuration.name}"
   vpc_zone_identifier  = ["${var.subnet_ids}"]
@@ -19,7 +19,7 @@ resource "aws_autoscaling_group" "autoscaling_group" {
   tags = [
     {
       key                 = "Name"
-      value               = "${var.server_name}"
+      value               = "${var.cluster_name}"
       propagate_at_launch = true
     },
     "${var.tags}",
@@ -31,7 +31,7 @@ resource "aws_autoscaling_group" "autoscaling_group" {
 # ---------------------------------------------------------------------------------------------------------------------
 
 resource "aws_launch_configuration" "launch_configuration" {
-  name_prefix   = "${var.server_name}-"
+  name_prefix   = "${var.cluster_name}-"
   image_id      = "${var.ami_id}"
   instance_type = "${var.instance_type}"
   user_data     = "${var.user_data}"
@@ -72,8 +72,8 @@ resource "aws_launch_configuration" "launch_configuration" {
 # ---------------------------------------------------------------------------------------------------------------------
 
 resource "aws_security_group" "lc_security_group" {
-  name_prefix = "${var.server_name}-"
-  description = "Security group for the ${var.server_name} launch configuration"
+  name_prefix = "${var.cluster_name}-"
+  description = "Security group for the ${var.cluster_name} launch configuration"
   vpc_id      = "${var.vpc_id}"
 
   # aws_launch_configuration.launch_configuration in this module sets create_before_destroy to true, which means
@@ -124,7 +124,7 @@ resource "aws_security_group_rule" "allow_all_outbound" {
 # ---------------------------------------------------------------------------------------------------------------------
 
 resource "aws_iam_instance_profile" "instance_profile" {
-  name_prefix = "${var.server_name}"
+  name_prefix = "${var.cluster_name}"
   path        = "${var.instance_profile_path}"
   role        = "${aws_iam_role.instance_role.name}"
 
@@ -137,7 +137,7 @@ resource "aws_iam_instance_profile" "instance_profile" {
 }
 
 resource "aws_iam_role" "instance_role" {
-  name_prefix        = "${var.server_name}"
+  name_prefix        = "${var.cluster_name}"
   assume_role_policy = "${data.aws_iam_policy_document.instance_role.json}"
 
   # aws_iam_instance_profile.instance_profile in this module sets create_before_destroy to true, which means
