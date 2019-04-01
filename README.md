@@ -11,8 +11,8 @@ The rest of the [TICK stack](https://www.influxdata.com/time-series-platform/) i
 ## Quick start
 
 If you want to quickly spin up an InfluxDB cluster, you can run the simple example that is in the root of this repo.
-Check out [influxdb-single-cluster example
-documentation](https://github.com/gruntwork-io/terraform-aws-influx/blob/master/examples/influxdb-single-cluster)
+Check out [influxdb-cluster-simple example
+documentation](https://github.com/gruntwork-io/terraform-aws-influx/blob/master/examples/influxdb-cluster-simple)
 for instructions.
 
 ## What's in this repo
@@ -21,7 +21,7 @@ This repo has the following folder structure:
 
 * [root](https://github.com/gruntwork-io/terraform-aws-influx/tree/master): The root folder contains an example
   of how to deploy InfluxDB as a single-cluster. See 
-  [influxdb-single-cluster](https://github.com/gruntwork-io/terraform-aws-influx/blob/master/examples/influxdb-single-cluster)
+  [influxdb-cluster-simple](https://github.com/gruntwork-io/terraform-aws-influx/blob/master/examples/influxdb-cluster-simple)
   for the documentation.
 * [modules](https://github.com/gruntwork-io/terraform-aws-influx/tree/master/modules): This folder contains the 
   main implementation code for this Module, broken down into multiple standalone submodules.

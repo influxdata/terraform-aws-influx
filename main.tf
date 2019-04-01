@@ -102,7 +102,7 @@ module "influxdb" {
 # ---------------------------------------------------------------------------------------------------------------------
 
 data "template_file" "user_data_influxdb" {
-  template = "${file("${path.module}/examples/influxdb-single-cluster/user-data/user-data.sh")}"
+  template = "${file("${path.module}/examples/influxdb-cluster-simple/user-data/user-data.sh")}"
 
   vars {
     cluster_asg_name = "${var.influxdb_cluster_name}"
