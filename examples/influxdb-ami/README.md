@@ -24,7 +24,7 @@ To build the InfluxDB AMI:
 1. To build an Amazon Linux AMI for InfluxDB Enterprise: `packer build -only=amazon-linux-ami influxdb.json`.
 
 When the build finishes, it will output the IDs of the new AMIs. To see how to deploy this AMI, check out the 
-[influxdb-single-cluster](https://github.com/gruntwork-io/terraform-aws-influx/tree/master/examples/influxdb-single-cluster) and
+[influxdb-cluster-simple](https://github.com/gruntwork-io/terraform-aws-influx/tree/master/examples/influxdb-cluster-simple) and
 [influxdb-multi-cluster](https://github.com/gruntwork-io/terraform-aws-influx/tree/master/examples/influxdb-multi-cluster) 
 examples.
 
