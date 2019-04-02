@@ -1,12 +1,10 @@
 [![Maintained by Gruntwork.io](https://img.shields.io/badge/maintained%20by-gruntwork.io-%235849a6.svg)](https://gruntwork.io/?ref=repo_aws_influx)
-# InfluxDB AWS Module
+# TICK Stack AWS Module
 
-This repo contains the **official** module for deploying [InfluxDB Enterprise](https://www.influxdata.com/time-series-platform/influxdb/) on [AWS](https://aws.amazon.com/) 
-using [Terraform](https://www.terraform.io/) and [Packer](https://www.packer.io/). InfluxDB is a distributed time series database.
-This module only supports the InfluxDB Enterprise Edition and not the Open Source edition.
-The rest of the [TICK stack](https://www.influxdata.com/time-series-platform/) is also not supported.
+This repo contains the **official** module for deploying the [TICK stack](https://www.influxdata.com/time-series-platform/) on [AWS](https://aws.amazon.com/) 
+using [Terraform](https://www.terraform.io/) and [Packer](https://www.packer.io/).
 
-![InfluxDB multi-cluster architecture](https://github.com/gruntwork-io/terraform-aws-influx/blob/master/_docs/influxdb-multi-cluster-architecture.png?raw=true)
+![TICK multi-cluster architecture](https://github.com/gruntwork-io/terraform-aws-influx/blob/master/_docs/tick-multi-cluster-architecture.png?raw=true)
 
 ## Quick start
 
@@ -32,20 +30,63 @@ This repo has the following folder structure:
 
 ## How to use this repo
 
-The general idea is to: 
+The general idea is to:
 
-1. Use the scripts in the
-   [install-influxdb](https://github.com/gruntwork-io/terraform-aws-influx/tree/master/modules/install-influxdb)
-   modules to create an AMI with InfluxDB installed.
+* ### Telegraf
 
-1. Deploy the AMI across one or more Auto Scaling Groups (ASG) using the [influxdb-cluster
-   module](https://github.com/gruntwork-io/terraform-aws-influx/tree/master/modules/influxdb-cluster).   
-   
-1. Configure each server in the ASGs to execute the 
-   [run-influxdb](https://github.com/gruntwork-io/terraform-aws-influx/tree/master/modules/run-influxdb)
-   script during boot.
+    1. Use the scripts in the
+    [install-telegraf](https://github.com/gruntwork-io/terraform-aws-influx/tree/master/modules/install-telegraf)
+    modules to create an AMI with Telegraf installed, this AMI will generally be for the Application server.
 
-1. Deploy a load balancer in front of the data node ASG.
+    1. Configure each application server to execute the 
+    [run-telegraf](https://github.com/gruntwork-io/terraform-aws-influx/tree/master/modules/run-telegraf)
+    script during boot.
+
+* ### InfluxDB
+
+    1. Use the scripts in the
+    [install-influxdb](https://github.com/gruntwork-io/terraform-aws-influx/tree/master/modules/install-influxdb)
+    modules to create an AMI with InfluxDB Enterprise installed.
+
+    1. Deploy the AMI across one or more Auto Scaling Groups (ASG) using the [influxdb-cluster
+    module](https://github.com/gruntwork-io/terraform-aws-influx/tree/master/modules/influxdb-cluster).
+
+    1. Configure each server in the ASGs to execute the 
+    [run-influxdb](https://github.com/gruntwork-io/terraform-aws-influx/tree/master/modules/run-influxdb)
+    script during boot.
+
+    1. Deploy a load balancer in front of the data node ASG.
+
+* ### Chronograf
+
+    1. Use the scripts in the
+    [install-chronograf](https://github.com/gruntwork-io/terraform-aws-influx/tree/master/modules/install-chronograf)
+    modules to create an AMI with Chronograf installed.
+
+    1. Deploy the AMI in a single Auto Scaling Group (ASG) using the [chronograf-server
+    module](https://github.com/gruntwork-io/terraform-aws-influx/tree/master/modules/chronograf-cluster).
+
+    1. Configure the server to execute the 
+    [run-chronograf](https://github.com/gruntwork-io/terraform-aws-influx/tree/master/modules/run-chronograf)
+    script during boot.
+
+    1. Deploy a load balancer in front of the ASG.
+
+* ### Kapacitor
+
+    1. Use the scripts in the
+    [install-kapacitor](https://github.com/gruntwork-io/terraform-aws-influx/tree/master/modules/install-kapacitor)
+    modules to create an AMI with Kapacitor installed.
+
+    1. Deploy the AMI in a single Auto Scaling Group (ASG) using the [kapacitor-server
+    module](https://github.com/gruntwork-io/terraform-aws-influx/tree/master/modules/kapacitor-cluster).
+
+    1. Configure the server to execute the 
+    [run-kapacitor](https://github.com/gruntwork-io/terraform-aws-influx/tree/master/modules/run-kapacitor)
+    script during boot.
+
+    1. Deploy a load balancer in front of the ASG.
+    
 
 See the [examples folder](https://github.com/gruntwork-io/terraform-aws-influx/tree/master/examples) for working
 sample code.
