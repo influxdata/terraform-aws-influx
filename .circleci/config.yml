@@ -87,7 +87,4 @@ workflows:
             branches:
               only: master
     jobs:
-      - install_dependencies
-      - test:
-          requires:
-            - install_dependencies
+      - test
