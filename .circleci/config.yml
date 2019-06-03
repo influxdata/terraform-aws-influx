@@ -1,9 +1,30 @@
 defaults: &defaults
   working_directory: /home/circleci/.go_workspace/src/github.com/gruntwork-io/terraform-aws-influx
-  machine:
-    image: circleci/classic:201711-01
-#  docker:
-#    - image: circleci/golang:1.10
+  machine: true
+  environment:
+    GRUNTWORK_INSTALLER_VERSION: v0.0.21
+    TERRATEST_LOG_PARSER_VERSION: v0.13.13
+    MODULE_CI_VERSION: v0.13.3
+    TERRAFORM_VERSION: 0.11.13
+    TERRAGRUNT_VERSION: NONE
+    PACKER_VERSION: 1.3.2
+    GOLANG_VERSION: 1.11.2
+
+install_gruntwork_utils: &install_gruntwork_utils
+  name: install gruntwork utils
+  command: |
+    curl -Ls https://raw.githubusercontent.com/gruntwork-io/gruntwork-installer/master/bootstrap-gruntwork-installer.sh | bash /dev/stdin --version "${GRUNTWORK_INSTALLER_VERSION}"
+    gruntwork-install --module-name "gruntwork-module-circleci-helpers" --repo "https://github.com/gruntwork-io/module-ci" --tag "${MODULE_CI_VERSION}"
+    gruntwork-install --binary-name "terratest_log_parser" --repo "https://github.com/gruntwork-io/terratest" --tag "${TERRATEST_LOG_PARSER_VERSION}"
+    configure-environment-for-gruntwork-module \
+      --circle-ci-2-machine-executor \
+      --terraform-version ${TERRAFORM_VERSION} \
+      --terragrunt-version ${TERRAGRUNT_VERSION} \
+      --packer-version ${PACKER_VERSION} \
+      --use-go-dep \
+      --go-version ${GOLANG_VERSION} \
+      --go-src-path test
+
 
 version: 2.0
 jobs:
@@ -11,18 +32,10 @@ jobs:
     <<: *defaults
     steps:
       - checkout
-      - run: &install_gruntwork_tooling
-          name: install gruntwork tooling
-          command: |
-            sudo apt-get -y update
-            curl -Ls https://raw.githubusercontent.com/gruntwork-io/gruntwork-installer/master/bootstrap-gruntwork-installer.sh | bash /dev/stdin --version v0.0.21
-            gruntwork-install --module-name "gruntwork-module-circleci-helpers" --repo "https://github.com/gruntwork-io/module-ci" --tag "v0.13.3"
-            configure-environment-for-gruntwork-module --circle-ci-2 --use-go-dep --go-src-path test
 
+      # Install gruntwork utilities
       - run:
-          name: install terratest log parser
-          command: |
-            gruntwork-install --binary-name 'terratest_log_parser' --repo 'https://github.com/gruntwork-io/terratest' --tag 'v0.13.8'
+          <<: *install_gruntwork_utils
 
       - run:
           name: create log directory
@@ -51,12 +64,9 @@ jobs:
       # The weird way you have to set PATH in Circle 2.0
       - run: echo 'export PATH=$HOME/.local/bin:$HOME/terraform:$HOME/packer:$PATH' >> $BASH_ENV
 
-      # Use the Gruntwork Installer to install the gruntwork-module-circleci-helpers
-      - run: curl -Ls https://raw.githubusercontent.com/gruntwork-io/gruntwork-installer/master/bootstrap-gruntwork-installer.sh | bash /dev/stdin --version v0.0.21
-      - run: gruntwork-install --module-name "gruntwork-module-circleci-helpers" --repo "https://github.com/gruntwork-io/module-ci" --tag "v0.13.3"
-      - run: gruntwork-install --module-name "build-helpers" --repo "https://github.com/gruntwork-io/module-ci" --tag "v0.13.3"
-      - run: gruntwork-install --module-name "aws-helpers" --repo "https://github.com/gruntwork-io/module-ci" --tag "v0.13.3"
-      - run: configure-environment-for-gruntwork-module --circle-ci-2-machine-executor --go-src-path test --use-go-dep --terraform-version NONE --terragrunt-version NONE --glide-version NONE
+      # Install gruntwork utilities
+      - run:
+          <<: *install_gruntwork_utils
 
       - run: ~/project/.circleci/publish-amis.sh "influxdb-ami-ubuntu"
       - run: ~/project/.circleci/publish-amis.sh "influxdb-ami-amazon-linux"
