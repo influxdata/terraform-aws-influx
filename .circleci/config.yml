@@ -1,4 +1,5 @@
 defaults: &defaults
+  working_directory: /home/circleci/.go_workspace/src/github.com/gruntwork-io/terraform-aws-influx
   machine: true
   environment:
     GRUNTWORK_INSTALLER_VERSION: v0.0.21
@@ -16,6 +17,7 @@ install_gruntwork_utils: &install_gruntwork_utils
     gruntwork-install --module-name "gruntwork-module-circleci-helpers" --repo "https://github.com/gruntwork-io/module-ci" --tag "${MODULE_CI_VERSION}"
     gruntwork-install --binary-name "terratest_log_parser" --repo "https://github.com/gruntwork-io/terratest" --tag "${TERRATEST_LOG_PARSER_VERSION}"
     configure-environment-for-gruntwork-module \
+      --circle-ci-2 \
       --circle-ci-2-machine-executor \
       --terraform-version ${TERRAFORM_VERSION} \
       --terragrunt-version ${TERRAGRUNT_VERSION} \
@@ -23,7 +25,6 @@ install_gruntwork_utils: &install_gruntwork_utils
       --use-go-dep \
       --go-version ${GOLANG_VERSION} \
       --go-src-path test
-
 
 version: 2.0
 jobs:
