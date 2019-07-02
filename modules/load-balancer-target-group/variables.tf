@@ -40,7 +40,7 @@ variable "health_check_path" {
 
 variable "vpc_id" {
   description = "The ID of the VPC in which to deploy the Target Group"
-  string      = string
+  type      = string
 }
 
 # ---------------------------------------------------------------------------------------------------------------------
