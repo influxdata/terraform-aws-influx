@@ -59,7 +59,7 @@ variable "allowed_ssh_security_group_ids" {
 variable "allowed_ssh_security_group_ids_num" {
   description = "The number of security group IDs in var.beats_port_security_groups. We should be able to compute this automatically, but due to a Terraform limitation, if there are any dynamic resources in var.allowed_ssh_security_group_ids, then we won't be able to: https://github.com/hashicorp/terraform/pull/11482"
   type        = number
-  default     = null
+  default     = 0
 }
 
 variable "termination_policies" {
@@ -169,7 +169,7 @@ variable "ssh_port" {
 
 variable "tags" {
   description = "List fo extra tag blocks added to the autoscaling group configuration. Each element in the list is a map containing keys 'key', 'value', and 'propagate_at_launch' mapped to the respective values."
-  type        = list(string)
+  type        = any
   default     = []
   # Example:
   #

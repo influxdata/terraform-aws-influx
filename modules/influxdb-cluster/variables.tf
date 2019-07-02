@@ -69,7 +69,7 @@ variable "allowed_ssh_security_group_ids" {
 variable "allowed_ssh_security_group_ids_num" {
   description = "The number of security group IDs in var.beats_port_security_groups. We should be able to compute this automatically, but due to a Terraform limitation, if there are any dynamic resources in var.allowed_ssh_security_group_ids, then we won't be able to: https://github.com/hashicorp/terraform/pull/11482"
   type        = number
-  default     = null
+  default     = 0
 }
 
 variable "termination_policies" {

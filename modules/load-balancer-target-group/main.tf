@@ -50,8 +50,8 @@ resource "aws_alb_listener_rule" "http_path" {
   dynamic "condition" {
     for_each = [var.routing_condition]
     content {
-      field  = lookup(condition.value, "field", null)
-      values = lookup(condition.value, "values", null)
+      field  = lookup(condition, "field", null)
+      values = lookup(condition, "values", null)
     }
   }
 }
