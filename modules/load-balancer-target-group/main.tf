@@ -47,12 +47,9 @@ resource "aws_alb_listener_rule" "http_path" {
     type             = "forward"
   }
 
-  dynamic "condition" {
-    for_each = [var.routing_condition]
-    content {
-      field  = lookup(condition, "field", null)
-      values = lookup(condition, "values", null)
-    }
+  condition {
+    field = var.routing_condition.field
+    values = var.routing_condition.values
   }
 }
 

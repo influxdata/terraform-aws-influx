@@ -89,7 +89,7 @@ func TestTickMultiCluster(t *testing.T) {
 			examplesDir := test_structure.CopyTerraformFolderToTemp(t, "..", "/examples")
 
 			test_structure.RunTestStage(t, "setup_ami", func() {
-				awsRegion := aws.GetRandomRegion(t, nil, []string{"eu-west-3"})
+				awsRegion := aws.GetRandomRegion(t, nil, []string{"eu-north-1"})
 
 				influxAmis := buildAllAmis(
 					t,

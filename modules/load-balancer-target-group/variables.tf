@@ -56,12 +56,10 @@ variable "routing_condition" {
   # So, we have to fall back to just any ugly "any."
   type        = any
 
-  default = [
-    {
-      field  = "path-pattern"
-      values = ["*"]
-    },
-  ]
+  default = {
+    field  = "path-pattern"
+    values = ["*"]
+  }
 }
 
 variable "protocol" {
