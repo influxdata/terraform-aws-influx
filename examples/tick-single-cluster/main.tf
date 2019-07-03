@@ -2,9 +2,18 @@
 # DEPLOY A SINGLE NODE TICK CLUSTER
 # ---------------------------------------------------------------------------------------------------------------------
 
+# ----------------------------------------------------------------------------------------------------------------------
+# REQUIRE A SPECIFIC TERRAFORM VERSION OR HIGHER
+# This module has been updated with 0.12 syntax, which means it is no longer compatible with any versions below 0.12.
+# ----------------------------------------------------------------------------------------------------------------------
+
+terraform {
+  required_version = ">= 0.12"
+}
+
 provider "aws" {
   # The AWS region in which all resources will be created
-  region = "${var.aws_region}"
+  region = var.aws_region
 }
 
 module "tick" {
@@ -13,7 +22,7 @@ module "tick" {
   # source = "git::git@github.com:gruntwork-io/terraform-aws-influx.git//modules/influxdb-cluster?ref=v0.0.1"
   source = "../../modules/influxdb-cluster"
 
-  cluster_name = "${var.cluster_name}"
+  cluster_name = var.cluster_name
   min_size     = 1
   max_size     = 1
 
@@ -21,20 +30,20 @@ module "tick" {
   # R4 or M4 instances.
   instance_type = "t2.micro"
 
-  ami_id    = "${var.ami_id}"
-  user_data = "${data.template_file.user_data_tick.rendered}"
+  ami_id    = var.ami_id
+  user_data = data.template_file.user_data_tick.rendered
 
-  vpc_id     = "${data.aws_vpc.default.id}"
-  subnet_ids = "${data.aws_subnet_ids.default.ids}"
+  vpc_id     = data.aws_vpc.default.id
+  subnet_ids = data.aws_subnet_ids.default.ids
 
   ebs_block_devices = [
     {
-      device_name = "${var.influxdb_volume_device_name}"
+      device_name = var.influxdb_volume_device_name
       volume_type = "gp2"
       volume_size = 50
     },
     {
-      device_name = "${var.kapacitor_volume_device_name}"
+      device_name = var.kapacitor_volume_device_name
       volume_type = "gp2"
       volume_size = 50
     },
@@ -44,7 +53,7 @@ module "tick" {
   # recommend you limit this to the IP address ranges of known, trusted servers inside your VPC.
   allowed_ssh_cidr_blocks = ["0.0.0.0/0"]
 
-  ssh_key_name = "${var.ssh_key_name}"
+  ssh_key_name = var.ssh_key_name
 
   # To make it easy to test this example from your computer, we allow the InfluxDB servers to have public IPs. In a
   # production deployment, you'll probably want to keep all the servers in private subnets with only private IPs.
@@ -70,33 +79,29 @@ module "tick" {
 # ---------------------------------------------------------------------------------------------------------------------
 
 data "template_file" "user_data_tick" {
-  template = "${file("${path.module}/user-data/user-data.sh")}"
+  template = file("${path.module}/user-data/user-data.sh")
 
-  vars {
+  vars = {
     # InfluxDB
-    cluster_asg_name = "${var.cluster_name}"
-    aws_region       = "${var.aws_region}"
-    license_key      = "${var.license_key}"
-    shared_secret    = "${var.shared_secret}"
-
+    cluster_asg_name = var.cluster_name
+    aws_region       = var.aws_region
+    license_key      = var.license_key
+    shared_secret    = var.shared_secret
     # Pass in the data about the EBS volumes so they can be mounted
-    influxdb_volume_device_name = "${var.influxdb_volume_device_name}"
-    influxdb_volume_mount_point = "${var.influxdb_volume_mount_point}"
-    influxdb_volume_owner       = "${var.influxdb_volume_owner}"
-
+    influxdb_volume_device_name = var.influxdb_volume_device_name
+    influxdb_volume_mount_point = var.influxdb_volume_mount_point
+    influxdb_volume_owner       = var.influxdb_volume_owner
     # Telegraf
     influxdb_url  = "http://localhost:8086"
-    database_name = "${var.telegraf_database}"
-
+    database_name = var.telegraf_database
     # Chronograf
     host = "0.0.0.0"
     port = "8888"
-
     # Kapacitor
     hostname                     = "localhost"
-    kapacitor_volume_device_name = "${var.kapacitor_volume_device_name}"
-    kapacitor_volume_mount_point = "${var.kapacitor_volume_mount_point}"
-    kapacitor_volume_owner       = "${var.kapacitor_volume_owner}"
+    kapacitor_volume_device_name = var.kapacitor_volume_device_name
+    kapacitor_volume_mount_point = var.kapacitor_volume_mount_point
+    kapacitor_volume_owner       = var.kapacitor_volume_owner
   }
 }
 
@@ -111,7 +116,7 @@ module "influxdb_security_group_rules" {
   # source = "git::git@github.com:gruntwork-io/terraform-aws-influx.git//modules/influxdb-security-group-rules?ref=v0.0.1"
   source = "../../modules/influxdb-security-group-rules"
 
-  security_group_id = "${module.tick.security_group_id}"
+  security_group_id = module.tick.security_group_id
 
   raft_port = 8089
   rest_port = 8091
@@ -133,7 +138,7 @@ module "chronograf_security_group_rules" {
   # source = "git::git@github.com:gruntwork-io/terraform-aws-influx.git//modules/chronograf-security-group-rules?ref=v0.0.1"
   source = "../../modules/chronograf-security-group-rules"
 
-  security_group_id = "${module.tick.security_group_id}"
+  security_group_id = module.tick.security_group_id
 
   http_port = 8888
 
@@ -148,7 +153,7 @@ module "kapacitor_security_group_rules" {
   # source = "git::git@github.com:gruntwork-io/terraform-aws-influx.git//modules/kapacitor-security-group-rules?ref=v0.0.1"
   source = "../../modules/kapacitor-security-group-rules"
 
-  security_group_id = "${module.tick.security_group_id}"
+  security_group_id = module.tick.security_group_id
 
   http_port = 9092
 
@@ -168,7 +173,7 @@ module "influxdb_iam_policies" {
   # source = "git::git@github.com:gruntwork-io/terraform-aws-influx.git//modules/influxdb-iam-policies?ref=v0.0.1"
   source = "../../modules/influxdb-iam-policies"
 
-  iam_role_id = "${module.tick.iam_role_id}"
+  iam_role_id = module.tick.iam_role_id
 }
 
 # ---------------------------------------------------------------------------------------------------------------------
@@ -182,8 +187,8 @@ module "load_balancer" {
   source = "../../modules/load-balancer"
 
   name       = "${var.cluster_name}-lb"
-  vpc_id     = "${data.aws_vpc.default.id}"
-  subnet_ids = "${data.aws_subnet_ids.default.ids}"
+  vpc_id     = data.aws_vpc.default.id
+  subnet_ids = data.aws_subnet_ids.default.ids
 
   http_listener_ports = [8086, 8888, 9092]
 
@@ -202,13 +207,13 @@ module "influxdb_target_group" {
   source = "../../modules/load-balancer-target-group"
 
   target_group_name    = "${var.cluster_name}-itg"
-  asg_name             = "${module.tick.asg_name}"
-  port                 = "${module.influxdb_security_group_rules.api_port}"
+  asg_name             = module.tick.asg_name
+  port                 = module.influxdb_security_group_rules.api_port
   health_check_path    = "/ping"
   health_check_matcher = "204"
-  vpc_id               = "${data.aws_vpc.default.id}"
+  vpc_id               = data.aws_vpc.default.id
 
-  listener_arns                   = ["${lookup(module.load_balancer.http_listener_arns, 8086)}"]
+  listener_arns                   = [module.load_balancer.http_listener_arns[8086]]
   listener_arns_num               = 1
   listener_rule_starting_priority = 100
 }
@@ -220,13 +225,13 @@ module "chronograf_target_group" {
   source = "../../modules/load-balancer-target-group"
 
   target_group_name    = "${var.cluster_name}-ctg"
-  asg_name             = "${module.tick.asg_name}"
-  port                 = "${module.chronograf_security_group_rules.http_port}"
+  asg_name             = module.tick.asg_name
+  port                 = module.chronograf_security_group_rules.http_port
   health_check_path    = "/"
   health_check_matcher = "200"
-  vpc_id               = "${data.aws_vpc.default.id}"
+  vpc_id               = data.aws_vpc.default.id
 
-  listener_arns                   = ["${lookup(module.load_balancer.http_listener_arns, 8888)}"]
+  listener_arns                   = [module.load_balancer.http_listener_arns[8888]]
   listener_arns_num               = 1
   listener_rule_starting_priority = 100
 }
@@ -238,13 +243,13 @@ module "kapacitor_target_group" {
   source = "../../modules/load-balancer-target-group"
 
   target_group_name    = "${var.cluster_name}-ktg"
-  asg_name             = "${module.tick.asg_name}"
-  port                 = "${module.kapacitor_security_group_rules.http_port}"
+  asg_name             = module.tick.asg_name
+  port                 = module.kapacitor_security_group_rules.http_port
   health_check_path    = "/kapacitor/v1/ping"
   health_check_matcher = "204"
-  vpc_id               = "${data.aws_vpc.default.id}"
+  vpc_id               = data.aws_vpc.default.id
 
-  listener_arns                   = ["${lookup(module.load_balancer.http_listener_arns, 9092)}"]
+  listener_arns                   = [module.load_balancer.http_listener_arns[9092]]
   listener_arns_num               = 1
   listener_rule_starting_priority = 100
 }
@@ -261,5 +266,5 @@ data "aws_vpc" "default" {
 }
 
 data "aws_subnet_ids" "default" {
-  vpc_id = "${data.aws_vpc.default.id}"
+  vpc_id = data.aws_vpc.default.id
 }

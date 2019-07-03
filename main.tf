@@ -4,6 +4,15 @@
 # balancer in front of the data nodes to handle providing the public interface into the cluster.
 # ---------------------------------------------------------------------------------------------------------------------
 
+# ----------------------------------------------------------------------------------------------------------------------
+# REQUIRE A SPECIFIC TERRAFORM VERSION OR HIGHER
+# This module has been updated with 0.12 syntax, which means it is no longer compatible with any versions below 0.12.
+# ----------------------------------------------------------------------------------------------------------------------
+
+terraform {
+  required_version = ">= 0.12"
+}
+
 provider "aws" {
   # The AWS region in which all resources will be created
   region = var.aws_region
