@@ -10,7 +10,7 @@ variable "security_group_id" {
 
 variable "http_port" {
   description = "The HTTP port that Chronograf will listen on for connections"
-  type = number
+  type        = number
 }
 
 # ---------------------------------------------------------------------------------------------------------------------

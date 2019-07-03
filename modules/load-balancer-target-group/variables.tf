@@ -40,7 +40,7 @@ variable "health_check_path" {
 
 variable "vpc_id" {
   description = "The ID of the VPC in which to deploy the Target Group"
-  type      = string
+  type        = string
 }
 
 # ---------------------------------------------------------------------------------------------------------------------
@@ -54,7 +54,7 @@ variable "routing_condition" {
   # object will be required (whereas some, such as encrypted, should be optional), and if we use list(map(...)), all
   # the values in the map must be of the same type, whereas we need some to be strings, some to be array.
   # So, we have to fall back to just any ugly "any."
-  type        = any
+  type = any
 
   default = {
     field  = "path-pattern"

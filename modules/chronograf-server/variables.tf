@@ -121,8 +121,8 @@ variable "ebs_block_devices" {
   # object will be required (whereas some, such as encrypted, should be optional), and if we use list(map(...)), all
   # the values in the map must be of the same type, whereas we need some to be strings, some to be bools, and some to
   # be ints. So, we have to fall back to just any ugly "any."
-  type        = any
-  default     = []
+  type    = any
+  default = []
   # Example:
   #
   # default = [

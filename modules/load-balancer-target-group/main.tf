@@ -48,7 +48,7 @@ resource "aws_alb_listener_rule" "http_path" {
   }
 
   condition {
-    field = var.routing_condition.field
+    field  = var.routing_condition.field
     values = var.routing_condition.values
   }
 }
