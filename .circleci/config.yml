@@ -71,7 +71,7 @@ jobs:
           command: |
             mkdir -p /tmp/logs
             # run the tests
-            run-go-tests --path test --timeout 60m TestTickMultiCluster | tee /tmp/logs/all.log
+            run-go-tests --path test --timeout 60m | tee /tmp/logs/all.log
           no_output_timeout: 3600s
       - run:
           command: terratest_log_parser --testlog /tmp/logs/all.log --outputdir /tmp/logs

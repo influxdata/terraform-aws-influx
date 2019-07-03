@@ -228,7 +228,7 @@ func buildAllAmis(t *testing.T, awsRegion string, telegrafPackerInfo *PackerInfo
 	return &InfluxAmis{
 		TelegrafAmiID:   telegrafAmiID,
 		InfluxdbAmiID:   influxdBAmiID,
-		ChronografAmiID: influxdBAmiID,
+		ChronografAmiID: chronografAmiID,
 		KapacitorAmiID:  kapacitorAmiID,
 	}
 }
