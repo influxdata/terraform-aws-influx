@@ -123,8 +123,8 @@ func validateTelegraf(t *testing.T, endpoint string, port string, databaseName s
 
 	defer c.Close()
 
-	maxRetries := 15
-	sleepBetweenRetries := 5 * time.Second
+	maxRetries := 30
+	sleepBetweenRetries := 10 * time.Second
 
 	retry.DoWithRetry(t, "Querying Telegraf database", maxRetries, sleepBetweenRetries, func() (string, error) {
 		// Read from database
