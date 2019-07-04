@@ -63,12 +63,11 @@ func TestTickSingleCluster(t *testing.T) {
 			time.Sleep(time.Duration(testCase.sleepDuration) * time.Second)
 
 			examplesDir := test_structure.CopyTerraformFolderToTemp(t, "..", "/examples")
-			saveDir := "../examples/tick-single-cluster"
 			amiDir := fmt.Sprintf("%s/tick-ami", examplesDir)
 			templatePath := fmt.Sprintf("%s/%s", amiDir, testCase.packerInfo.templatePath)
 
 			defer test_structure.RunTestStage(t, "teardown", func() {
-				terraformOptions := test_structure.LoadTerraformOptions(t, saveDir)
+				terraformOptions := test_structure.LoadTerraformOptions(t, examplesDir)
 				terraform.Destroy(t, terraformOptions)
 			})
 
@@ -80,7 +79,7 @@ func TestTickSingleCluster(t *testing.T) {
 				clusterName := fmt.Sprintf("tick-%s", uniqueID)
 
 				keyPair := aws.CreateAndImportEC2KeyPair(t, awsRegion, uniqueID)
-				test_structure.SaveEc2KeyPair(t, saveDir, keyPair)
+				test_structure.SaveEc2KeyPair(t, examplesDir, keyPair)
 
 				licenseKey := os.Getenv("LICENSE_KEY")
 				sharedSecret := os.Getenv("SHARED_SECRET")
@@ -101,37 +100,37 @@ func TestTickSingleCluster(t *testing.T) {
 					},
 				}
 
-				test_structure.SaveTerraformOptions(t, saveDir, terraformOptions)
+				test_structure.SaveTerraformOptions(t, examplesDir, terraformOptions)
 			})
 
 			test_structure.RunTestStage(t, "deploy_to_aws", func() {
-				terraformOptions := test_structure.LoadTerraformOptions(t, saveDir)
+				terraformOptions := test_structure.LoadTerraformOptions(t, examplesDir)
 				terraform.InitAndApply(t, terraformOptions)
 			})
 
 			test_structure.RunTestStage(t, "validate_influxdb", func() {
-				terraformOptions := test_structure.LoadTerraformOptions(t, saveDir)
+				terraformOptions := test_structure.LoadTerraformOptions(t, examplesDir)
 				endpoint := terraform.Output(t, terraformOptions, "lb_dns_name")
 				port := terraform.Output(t, terraformOptions, "influxdb_port")
 				validateInfluxdb(t, endpoint, port)
 			})
 
 			test_structure.RunTestStage(t, "validate_telegraf", func() {
-				terraformOptions := test_structure.LoadTerraformOptions(t, saveDir)
+				terraformOptions := test_structure.LoadTerraformOptions(t, examplesDir)
 				endpoint := terraform.Output(t, terraformOptions, "lb_dns_name")
 				port := terraform.Output(t, terraformOptions, "influxdb_port")
 				validateTelegraf(t, endpoint, port, "telegraf")
 			})
 
 			test_structure.RunTestStage(t, "validate_chronograf", func() {
-				terraformOptions := test_structure.LoadTerraformOptions(t, saveDir)
+				terraformOptions := test_structure.LoadTerraformOptions(t, examplesDir)
 				endpoint := terraform.Output(t, terraformOptions, "lb_dns_name")
 				port := terraform.Output(t, terraformOptions, "chronograf_port")
 				validateChronograf(t, endpoint, port)
 			})
 
 			test_structure.RunTestStage(t, "validate_kapacitor", func() {
-				terraformOptions := test_structure.LoadTerraformOptions(t, saveDir)
+				terraformOptions := test_structure.LoadTerraformOptions(t, examplesDir)
 				endpoint := terraform.Output(t, terraformOptions, "lb_dns_name")
 				port := terraform.Output(t, terraformOptions, "kapacitor_port")
 				validateKapacitor(t, endpoint, port)
