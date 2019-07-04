@@ -63,7 +63,7 @@ func TestTickSingleCluster(t *testing.T) {
 			time.Sleep(time.Duration(testCase.sleepDuration) * time.Second)
 
 			examplesDir := test_structure.CopyTerraformFolderToTemp(t, "..", "/examples")
-			saveDir := "../examples/tick-single-cluster"
+			saveDir := fmt.Sprintf("../examples/tick-single-cluster/%s", testCase.testName)
 			amiDir := fmt.Sprintf("%s/tick-ami", examplesDir)
 			templatePath := fmt.Sprintf("%s/%s", amiDir, testCase.packerInfo.templatePath)
 

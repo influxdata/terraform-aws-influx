@@ -87,7 +87,7 @@ func TestTickMultiCluster(t *testing.T) {
 			time.Sleep(time.Duration(testCase.sleepDuration) * time.Second)
 
 			examplesDir := test_structure.CopyTerraformFolderToTemp(t, "..", "/examples")
-			saveDir := "../examples/tick-multi-cluster"
+			saveDir := fmt.Sprintf("../examples/tick-multi-cluster/%s", testCase.testName)
 
 			test_structure.RunTestStage(t, "setup_ami", func() {
 				awsRegion := aws.GetRandomRegion(t, nil, []string{"eu-north-1"})
