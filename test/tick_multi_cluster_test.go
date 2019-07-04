@@ -87,6 +87,7 @@ func TestTickMultiCluster(t *testing.T) {
 			time.Sleep(time.Duration(testCase.sleepDuration) * time.Second)
 
 			examplesDir := test_structure.CopyTerraformFolderToTemp(t, "..", "/examples")
+			saveDir := "../examples/tick-multi-cluster"
 
 			test_structure.RunTestStage(t, "setup_ami", func() {
 				awsRegion := aws.GetRandomRegion(t, nil, []string{"eu-north-1"})
@@ -110,7 +111,7 @@ func TestTickMultiCluster(t *testing.T) {
 				kapacitorServerName := fmt.Sprintf("kapacitor-server-%s", uniqueID)
 
 				keyPair := aws.CreateAndImportEC2KeyPair(t, awsRegion, uniqueID)
-				test_structure.SaveEc2KeyPair(t, examplesDir, keyPair)
+				test_structure.SaveEc2KeyPair(t, saveDir, keyPair)
 
 				licenseKey := os.Getenv("LICENSE_KEY")
 				sharedSecret := os.Getenv("SHARED_SECRET")
@@ -138,15 +139,15 @@ func TestTickMultiCluster(t *testing.T) {
 					},
 				}
 
-				test_structure.SaveTerraformOptions(t, examplesDir, terraformOptions)
+				test_structure.SaveTerraformOptions(t, saveDir, terraformOptions)
 			})
 
 			defer test_structure.RunTestStage(t, "teardown", func() {
-				terraformOptions := test_structure.LoadTerraformOptions(t, examplesDir)
+				terraformOptions := test_structure.LoadTerraformOptions(t, saveDir)
 				terraform.Destroy(t, terraformOptions)
 
 				awsRegion := terraformOptions.Vars["aws_region"].(string)
-				keyPair := test_structure.LoadEc2KeyPair(t, examplesDir)
+				keyPair := test_structure.LoadEc2KeyPair(t, saveDir)
 
 				aws.DeleteAmi(t, awsRegion, terraformOptions.Vars["telegraf_ami_id"].(string))
 				aws.DeleteAmi(t, awsRegion, terraformOptions.Vars["influxdb_ami_id"].(string))
@@ -156,19 +157,19 @@ func TestTickMultiCluster(t *testing.T) {
 			})
 
 			test_structure.RunTestStage(t, "deploy_to_aws", func() {
-				terraformOptions := test_structure.LoadTerraformOptions(t, examplesDir)
+				terraformOptions := test_structure.LoadTerraformOptions(t, saveDir)
 				terraform.InitAndApply(t, terraformOptions)
 			})
 
 			test_structure.RunTestStage(t, "validate_influxdb", func() {
-				terraformOptions := test_structure.LoadTerraformOptions(t, examplesDir)
+				terraformOptions := test_structure.LoadTerraformOptions(t, saveDir)
 				endpoint := terraform.Output(t, terraformOptions, "influxdb_dns")
 				port := terraform.Output(t, terraformOptions, "influxdb_port")
 				validateInfluxdb(t, endpoint, port)
 			})
 
 			test_structure.RunTestStage(t, "validate_telegraf", func() {
-				terraformOptions := test_structure.LoadTerraformOptions(t, examplesDir)
+				terraformOptions := test_structure.LoadTerraformOptions(t, saveDir)
 				endpoint := terraform.Output(t, terraformOptions, "influxdb_dns")
 				port := terraform.Output(t, terraformOptions, "influxdb_port")
 				databaseName := terraform.Output(t, terraformOptions, "telegraf_database")
@@ -176,14 +177,14 @@ func TestTickMultiCluster(t *testing.T) {
 			})
 
 			test_structure.RunTestStage(t, "validate_chronograf", func() {
-				terraformOptions := test_structure.LoadTerraformOptions(t, examplesDir)
+				terraformOptions := test_structure.LoadTerraformOptions(t, saveDir)
 				endpoint := terraform.Output(t, terraformOptions, "chronograf_dns")
 				port := terraform.Output(t, terraformOptions, "chronograf_port")
 				validateChronograf(t, endpoint, port)
 			})
 
 			test_structure.RunTestStage(t, "validate_kapacitor", func() {
-				terraformOptions := test_structure.LoadTerraformOptions(t, examplesDir)
+				terraformOptions := test_structure.LoadTerraformOptions(t, saveDir)
 				endpoint := terraform.Output(t, terraformOptions, "kapacitor_dns")
 				port := terraform.Output(t, terraformOptions, "kapacitor_port")
 				validateKapacitor(t, endpoint, port)
