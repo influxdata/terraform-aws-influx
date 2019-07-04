@@ -123,16 +123,31 @@ func validateTelegraf(t *testing.T, endpoint string, port string, databaseName s
 
 	defer c.Close()
 
-	// Read from database
-	response, err := c.Query(client.Query{
-		Command:  "SELECT * FROM cpu",
-		Database: databaseName,
+	maxRetries := 15
+	sleepBetweenRetries := 5 * time.Second
+
+	retry.DoWithRetry(t, "Querying Telegraf database", maxRetries, sleepBetweenRetries, func() (string, error) {
+		// Read from database
+		response, err := c.Query(client.Query{
+			Command:  "SELECT * FROM cpu",
+			Database: databaseName,
+		})
+
+		if err != nil {
+			t.Logf("Query failed: %s", err.Error())
+			return "", err
+		}
+
+		if response.Error() != nil {
+			logger.Logf(t, "Query failed: %s", response.Error().Error())
+			return "", response.Error()
+		}
+
+		require.NoError(t, err, "Unable to read from database")
+		assert.NotEmpty(t, response.Results)
+
+		return "", nil
 	})
-
-	require.NoError(t, err, "Unable to read from database")
-	require.NoError(t, response.Error(), "Query failed")
-
-	assert.NotEmpty(t, response.Results)
 }
 
 func validateChronograf(t *testing.T, endpoint string, port string) {
