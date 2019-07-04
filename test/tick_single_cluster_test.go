@@ -34,20 +34,20 @@ func TestTickSingleCluster(t *testing.T) {
 		packerInfo    PackerInfo
 		sleepDuration int
 	}{
-		{
-			"TestTickSingleClusterUbuntu",
-			PackerInfo{
-				builderName:  "tick-ami-ubuntu",
-				templatePath: "tick.json"},
-			0,
-		},
-		{
-			"TestTickSingleClusterAmazonLinux",
-			PackerInfo{
-				builderName:  "tick-ami-amazon-linux",
-				templatePath: "tick.json"},
-			3,
-		},
+		// {
+		// 	"TestTickSingleClusterUbuntu",
+		// 	PackerInfo{
+		// 		builderName:  "tick-ami-ubuntu",
+		// 		templatePath: "tick.json"},
+		// 	0,
+		// },
+		// {
+		// 	"TestTickSingleClusterAmazonLinux",
+		// 	PackerInfo{
+		// 		builderName:  "tick-ami-amazon-linux",
+		// 		templatePath: "tick.json"},
+		// 	3,
+		// },
 	}
 
 	for _, testCase := range testcases {

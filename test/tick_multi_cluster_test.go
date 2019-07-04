@@ -56,22 +56,22 @@ func TestTickMultiCluster(t *testing.T) {
 				templatePath: "kapacitor-ami/kapacitor.json"},
 			0,
 		},
-		{
-			"TestTickMultiClusterAmazonLinux",
-			PackerInfo{
-				builderName:  "telegraf-ami-amazon-linux",
-				templatePath: "telegraf-ami/telegraf.json"},
-			PackerInfo{
-				builderName:  "influxdb-ami-amazon-linux",
-				templatePath: "influxdb-ami/influxdb.json"},
-			PackerInfo{
-				builderName:  "chronograf-ami-amazon-linux",
-				templatePath: "chronograf-ami/chronograf.json"},
-			PackerInfo{
-				builderName:  "kapacitor-ami-amazon-linux",
-				templatePath: "kapacitor-ami/kapacitor.json"},
-			3,
-		},
+		// {
+		// 	"TestTickMultiClusterAmazonLinux",
+		// 	PackerInfo{
+		// 		builderName:  "telegraf-ami-amazon-linux",
+		// 		templatePath: "telegraf-ami/telegraf.json"},
+		// 	PackerInfo{
+		// 		builderName:  "influxdb-ami-amazon-linux",
+		// 		templatePath: "influxdb-ami/influxdb.json"},
+		// 	PackerInfo{
+		// 		builderName:  "chronograf-ami-amazon-linux",
+		// 		templatePath: "chronograf-ami/chronograf.json"},
+		// 	PackerInfo{
+		// 		builderName:  "kapacitor-ami-amazon-linux",
+		// 		templatePath: "kapacitor-ami/kapacitor.json"},
+		// 	3,
+		// },
 	}
 
 	for _, testCase := range testcases {
@@ -145,14 +145,14 @@ func TestTickMultiCluster(t *testing.T) {
 				terraformOptions := test_structure.LoadTerraformOptions(t, examplesDir)
 				terraform.Destroy(t, terraformOptions)
 
-				awsRegion := terraformOptions.Vars["aws_region"].(string)
-				keyPair := test_structure.LoadEc2KeyPair(t, examplesDir)
+				// awsRegion := terraformOptions.Vars["aws_region"].(string)
+				// keyPair := test_structure.LoadEc2KeyPair(t, examplesDir)
 
-				aws.DeleteAmi(t, awsRegion, terraformOptions.Vars["telegraf_ami_id"].(string))
-				aws.DeleteAmi(t, awsRegion, terraformOptions.Vars["influxdb_ami_id"].(string))
-				aws.DeleteAmi(t, awsRegion, terraformOptions.Vars["chronograf_ami_id"].(string))
-				aws.DeleteAmi(t, awsRegion, terraformOptions.Vars["kapacitor_ami_id"].(string))
-				aws.DeleteEC2KeyPair(t, keyPair)
+				// aws.DeleteAmi(t, awsRegion, terraformOptions.Vars["telegraf_ami_id"].(string))
+				// aws.DeleteAmi(t, awsRegion, terraformOptions.Vars["influxdb_ami_id"].(string))
+				// aws.DeleteAmi(t, awsRegion, terraformOptions.Vars["chronograf_ami_id"].(string))
+				// aws.DeleteAmi(t, awsRegion, terraformOptions.Vars["kapacitor_ami_id"].(string))
+				// aws.DeleteEC2KeyPair(t, keyPair)
 			})
 
 			test_structure.RunTestStage(t, "deploy_to_aws", func() {
