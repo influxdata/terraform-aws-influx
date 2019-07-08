@@ -93,7 +93,7 @@ resource "aws_security_group_rule" "allow_http_inbound_from_cidr_blocks" {
 }
 
 resource "aws_security_group_rule" "allow_http_inbound_from_security_groups" {
-  count                    = length(var.http_listener_ports) * var.allow_inbound_from_security_groups_num
+  count                    = length(var.http_listener_ports) * (var.allow_inbound_from_security_groups_num == null ? 0 : var.allow_inbound_from_security_groups_num)
   type                     = "ingress"
   from_port                = element(var.http_listener_ports, count.index)
   to_port                  = element(var.http_listener_ports, count.index)

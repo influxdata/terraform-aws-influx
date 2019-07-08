@@ -33,5 +33,5 @@ variable "http_port_security_groups" {
 variable "http_port_security_groups_num" {
   description = "The number of security group IDs in var.http_port_security_groups. We should be able to compute this automatically, but due to a Terraform limitation, if there are any dynamic resources in var.http_port_security_groups, then we won't be able to: https://github.com/hashicorp/terraform/pull/11482"
   type        = number
-  default     = 0
+  default     = null
 }

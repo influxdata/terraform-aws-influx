@@ -49,7 +49,7 @@ variable "raft_port_security_groups" {
 variable "raft_port_security_groups_num" {
   description = "The number of security group IDs in var.raft_port_security_groups. We should be able to compute this automatically, but due to a Terraform limitation, if there are any dynamic resources in var.raft_port_security_groups, then we won't be able to: https://github.com/hashicorp/terraform/pull/11482"
   type        = number
-  default     = 0
+  default     = null
 }
 
 variable "rest_port_cidr_blocks" {
@@ -67,7 +67,7 @@ variable "rest_port_security_groups" {
 variable "rest_port_security_groups_num" {
   description = "The number of security group IDs in var.rest_port_security_groups. We should be able to compute this automatically, but due to a Terraform limitation, if there are any dynamic resources in var.rest_port_security_groups, then we won't be able to: https://github.com/hashicorp/terraform/pull/11482"
   type        = number
-  default     = 0
+  default     = null
 }
 
 variable "tcp_port_cidr_blocks" {
@@ -85,7 +85,7 @@ variable "tcp_port_security_groups" {
 variable "tcp_port_security_groups_num" {
   description = "The number of security group IDs in var.tcp_port_security_groups. We should be able to compute this automatically, but due to a Terraform limitation, if there are any dynamic resources in var.tcp_port_security_groups, then we won't be able to: https://github.com/hashicorp/terraform/pull/11482"
   type        = number
-  default     = 0
+  default     = null
 }
 
 variable "api_port_cidr_blocks" {
@@ -103,5 +103,5 @@ variable "api_port_security_groups" {
 variable "api_port_security_groups_num" {
   description = "The number of security group IDs in var.api_port_security_groups. We should be able to compute this automatically, but due to a Terraform limitation, if there are any dynamic resources in var.api_port_security_groups, then we won't be able to: https://github.com/hashicorp/terraform/pull/11482"
   type        = number
-  default     = 0
+  default     = null
 }

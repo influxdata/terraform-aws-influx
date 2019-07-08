@@ -18,7 +18,7 @@ resource "aws_security_group_rule" "raft_port_cidr_blocks" {
 }
 
 resource "aws_security_group_rule" "raft_port_security_groups" {
-  count                    = var.raft_port_security_groups_num
+  count                    = var.raft_port_security_groups_num == null ? 0 : var.raft_port_security_groups_num
   type                     = "ingress"
   from_port                = var.raft_port
   to_port                  = var.raft_port
@@ -38,7 +38,7 @@ resource "aws_security_group_rule" "rest_port_cidr_blocks" {
 }
 
 resource "aws_security_group_rule" "rest_port_security_groups" {
-  count                    = var.rest_port_security_groups_num
+  count                    = var.rest_port_security_groups_num == null ? 0 : var.rest_port_security_groups_num
   type                     = "ingress"
   from_port                = var.rest_port
   to_port                  = var.rest_port
@@ -58,7 +58,7 @@ resource "aws_security_group_rule" "tcp_port_cidr_blocks" {
 }
 
 resource "aws_security_group_rule" "tcp_port_security_groups" {
-  count                    = var.tcp_port_security_groups_num
+  count                    = var.tcp_port_security_groups_num == null ? 0 : var.tcp_port_security_groups_num
   type                     = "ingress"
   from_port                = var.tcp_port
   to_port                  = var.tcp_port
@@ -78,7 +78,7 @@ resource "aws_security_group_rule" "api_port_cidr_blocks" {
 }
 
 resource "aws_security_group_rule" "api_port_security_groups" {
-  count                    = var.api_port_security_groups_num
+  count                    = var.api_port_security_groups_num == null ? 0 : var.api_port_security_groups_num
   type                     = "ingress"
   from_port                = var.api_port
   to_port                  = var.api_port

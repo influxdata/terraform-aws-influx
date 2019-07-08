@@ -42,7 +42,7 @@ variable "allow_inbound_from_security_groups" {
 variable "allow_inbound_from_security_groups_num" {
   description = "The number of Security Group IDs in var.allow_inbound_from_security_groups. We should be able to compute this automatically, but due to a Terraform limitation, if there are any dynamic resources in var.allow_inbound_from_cidr_blocks, then we won't be able to: https://github.com/hashicorp/terraform/pull/11482"
   type        = number
-  default     = 0
+  default     = null
 }
 
 variable "default_target_group_arn" {

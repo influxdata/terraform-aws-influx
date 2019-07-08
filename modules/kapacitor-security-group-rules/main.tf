@@ -22,7 +22,7 @@ resource "aws_security_group_rule" "http_port_cidr_blocks" {
 }
 
 resource "aws_security_group_rule" "http_port_security_groups" {
-  count                    = var.http_port_security_groups_num
+  count                    = var.http_port_security_groups_num == null ? 0 : var.http_port_security_groups_num
   type                     = "ingress"
   from_port                = var.http_port
   to_port                  = var.http_port
