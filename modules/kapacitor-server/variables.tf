@@ -41,7 +41,7 @@ variable "user_data" {
 variable "ssh_key_name" {
   description = "The name of an EC2 Key Pair that can be used to SSH to the EC2 Instance. Set to an empty string to not associate a Key Pair."
   type        = string
-  default     = ""
+  default     = null
 }
 
 variable "allowed_ssh_cidr_blocks" {

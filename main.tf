@@ -50,7 +50,7 @@ data "aws_ami" "influxdb_ubuntu_example" {
 }
 
 locals {
-  ami_id = var.ami_id == "" ? data.aws_ami.influxdb_ubuntu_example.id : var.ami_id
+  ami_id = var.ami_id == null ? data.aws_ami.influxdb_ubuntu_example.id : var.ami_id
 }
 
 module "influxdb" {
