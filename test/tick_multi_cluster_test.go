@@ -32,12 +32,12 @@ func TestTickMultiCluster(t *testing.T) {
 	// os.Setenv("SKIP_validate_kapacitor", "true")
 	// os.Setenv("SKIP_teardown", "true")
 
-	if os.Getenv("CIRCLECI") == "true" {
-		// The test for validating telegraf fails intermittently on circle ci
-		// So we will skip for now till we resolve that
-		os.Setenv("SKIP_validate_telegraf", "true")
-		fmt.Println("Skipping validate telegraf test on circle-ci.")
-	}
+	// if os.Getenv("CIRCLECI") == "true" {
+	// 	// The test for validating telegraf fails intermittently on circle ci
+	// 	// So we will skip for now till we resolve that
+	// 	os.Setenv("SKIP_validate_telegraf", "true")
+	// 	fmt.Println("Skipping validate telegraf test on circle-ci.")
+	// }
 
 	var testcases = []struct {
 		testName             string
