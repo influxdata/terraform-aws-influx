@@ -30,7 +30,7 @@ func buildAmi(t *testing.T, templatePath string, builderName string, awsRegion s
 		},
 	}
 
-	return packer.BuildAmi(t, options)
+	return packer.BuildArtifact(t, options)
 }
 
 func validateInfluxdb(t *testing.T, endpoint string, port string) {
