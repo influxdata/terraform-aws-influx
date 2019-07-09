@@ -2,6 +2,7 @@ package test
 
 import (
 	"fmt"
+	"github.com/gruntwork-io/terratest/modules/packer"
 	"os"
 	"strings"
 	"testing"
@@ -93,10 +94,26 @@ func TestTickMultiCluster(t *testing.T) {
 			test_structure.RunTestStage(t, "setup_ami", func() {
 				awsRegion := aws.GetRandomRegion(t, nil, []string{"eu-north-1"})
 
-				telegrafAmiID := buildAmi(t, fmt.Sprintf("%s/%s", examplesDir, testCase.telegrafPackerInfo.templatePath), testCase.telegrafPackerInfo.builderName, awsRegion)
-				influxdbAmiID := buildAmi(t, fmt.Sprintf("%s/%s", examplesDir, testCase.influxdbPackerInfo.templatePath), testCase.influxdbPackerInfo.builderName, awsRegion)
-				chronografAmiID := buildAmi(t, fmt.Sprintf("%s/%s", examplesDir, testCase.chronografPackerInfo.templatePath), testCase.chronografPackerInfo.builderName, awsRegion)
-				kapacitorAmiID := buildAmi(t, fmt.Sprintf("%s/%s", examplesDir, testCase.kapacitorPackerInfo.templatePath), testCase.kapacitorPackerInfo.builderName, awsRegion)
+				telegrafTemplatePath := fmt.Sprintf("%s/%s", examplesDir, testCase.telegrafPackerInfo.templatePath)
+				influxTemplatePath := fmt.Sprintf("%s/%s", examplesDir, testCase.influxdbPackerInfo.templatePath)
+				chronografTemplatePath := fmt.Sprintf("%s/%s", examplesDir, testCase.chronografPackerInfo.templatePath)
+				kapacitorTemplatePath := fmt.Sprintf("%s/%s", examplesDir, testCase.kapacitorPackerInfo.templatePath)
+
+				packerMap := make(map[string]*packer.Options)
+
+				packerMap["t"] = createPackerOptions(telegrafTemplatePath, testCase.telegrafPackerInfo.builderName, awsRegion)
+				packerMap["i"] = createPackerOptions(influxTemplatePath, testCase.influxdbPackerInfo.builderName, awsRegion)
+				packerMap["c"] = createPackerOptions(chronografTemplatePath, testCase.chronografPackerInfo.builderName, awsRegion)
+				packerMap["k"] = createPackerOptions(kapacitorTemplatePath, testCase.kapacitorPackerInfo.builderName, awsRegion)
+
+				imageIds, err := packer.BuildArtifactsE(t, packerMap)
+
+				require.NoError(t, err, "One of the Packer builds failed")
+
+				telegrafAmiID := imageIds["t"]
+				influxdbAmiID := imageIds["i"]
+				chronografAmiID := imageIds["c"]
+				kapacitorAmiID := imageIds["k"]
 
 				uniqueID := strings.ToLower(random.UniqueId())
 
