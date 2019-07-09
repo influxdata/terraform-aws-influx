@@ -4,11 +4,8 @@ import (
 	"fmt"
 	"os"
 	"strings"
-	"sync"
 	"testing"
 	"time"
-
-	"path/filepath"
 
 	"github.com/gruntwork-io/terratest/modules/aws"
 	"github.com/gruntwork-io/terratest/modules/random"
@@ -31,13 +28,6 @@ func TestTickMultiCluster(t *testing.T) {
 	// os.Setenv("SKIP_validate_chronograf", "true")
 	// os.Setenv("SKIP_validate_kapacitor", "true")
 	// os.Setenv("SKIP_teardown", "true")
-
-	// if os.Getenv("CIRCLECI") == "true" {
-	// 	// The test for validating telegraf fails intermittently on circle ci
-	// 	// So we will skip for now till we resolve that
-	// 	os.Setenv("SKIP_validate_telegraf", "true")
-	// 	fmt.Println("Skipping validate telegraf test on circle-ci.")
-	// }
 
 	var testcases = []struct {
 		testName             string
@@ -95,18 +85,18 @@ func TestTickMultiCluster(t *testing.T) {
 
 			examplesDir := test_structure.CopyTerraformFolderToTemp(t, "..", "/examples")
 
+			defer test_structure.RunTestStage(t, "teardown", func() {
+				terraformOptions := test_structure.LoadTerraformOptions(t, examplesDir)
+				terraform.Destroy(t, terraformOptions)
+			})
+
 			test_structure.RunTestStage(t, "setup_ami", func() {
 				awsRegion := aws.GetRandomRegion(t, nil, []string{"eu-north-1"})
 
-				influxAmis := buildAllAmis(
-					t,
-					awsRegion,
-					&testCase.telegrafPackerInfo,
-					&testCase.influxdbPackerInfo,
-					&testCase.chronografPackerInfo,
-					&testCase.kapacitorPackerInfo,
-					examplesDir,
-				)
+				telegrafAmiID := buildAmi(t, fmt.Sprintf("%s/%s", examplesDir, testCase.telegrafPackerInfo.templatePath), testCase.telegrafPackerInfo.builderName, awsRegion)
+				influxdbAmiID := buildAmi(t, fmt.Sprintf("%s/%s", examplesDir, testCase.influxdbPackerInfo.templatePath), testCase.influxdbPackerInfo.builderName, awsRegion)
+				chronografAmiID := buildAmi(t, fmt.Sprintf("%s/%s", examplesDir, testCase.chronografPackerInfo.templatePath), testCase.chronografPackerInfo.builderName, awsRegion)
+				kapacitorAmiID := buildAmi(t, fmt.Sprintf("%s/%s", examplesDir, testCase.kapacitorPackerInfo.templatePath), testCase.kapacitorPackerInfo.builderName, awsRegion)
 
 				uniqueID := strings.ToLower(random.UniqueId())
 
@@ -130,10 +120,10 @@ func TestTickMultiCluster(t *testing.T) {
 					TerraformDir: fmt.Sprintf("%s/tick-multi-cluster", examplesDir),
 					Vars: map[string]interface{}{
 						"aws_region":                       awsRegion,
-						"telegraf_ami_id":                  influxAmis.TelegrafAmiID,
-						"influxdb_ami_id":                  influxAmis.InfluxdbAmiID,
-						"chronograf_ami_id":                influxAmis.ChronografAmiID,
-						"kapacitor_ami_id":                 influxAmis.KapacitorAmiID,
+						"telegraf_ami_id":                  telegrafAmiID,
+						"influxdb_ami_id":                  influxdbAmiID,
+						"chronograf_ami_id":                chronografAmiID,
+						"kapacitor_ami_id":                 kapacitorAmiID,
 						"ssh_key_name":                     keyPair.Name,
 						"app_server_name":                  appServerName,
 						"influxdb_meta_nodes_cluster_name": metaClusterName,
@@ -146,20 +136,6 @@ func TestTickMultiCluster(t *testing.T) {
 				}
 
 				test_structure.SaveTerraformOptions(t, examplesDir, terraformOptions)
-			})
-
-			defer test_structure.RunTestStage(t, "teardown", func() {
-				terraformOptions := test_structure.LoadTerraformOptions(t, examplesDir)
-				terraform.Destroy(t, terraformOptions)
-
-				awsRegion := terraformOptions.Vars["aws_region"].(string)
-				keyPair := test_structure.LoadEc2KeyPair(t, examplesDir)
-
-				aws.DeleteAmi(t, awsRegion, terraformOptions.Vars["telegraf_ami_id"].(string))
-				aws.DeleteAmi(t, awsRegion, terraformOptions.Vars["influxdb_ami_id"].(string))
-				aws.DeleteAmi(t, awsRegion, terraformOptions.Vars["chronograf_ami_id"].(string))
-				aws.DeleteAmi(t, awsRegion, terraformOptions.Vars["kapacitor_ami_id"].(string))
-				aws.DeleteEC2KeyPair(t, keyPair)
 			})
 
 			test_structure.RunTestStage(t, "deploy_to_aws", func() {
@@ -198,51 +174,4 @@ func TestTickMultiCluster(t *testing.T) {
 
 		})
 	}
-}
-
-func buildAllAmis(t *testing.T, awsRegion string, telegrafPackerInfo *PackerInfo, influxdbPackerInfo *PackerInfo, chronografPackerInfo *PackerInfo, kapacitorPackerInfo *PackerInfo, examplesDir string) *InfluxAmis {
-	var waitForAmis sync.WaitGroup
-	waitForAmis.Add(4)
-
-	var telegrafAmiID string
-	var influxdBAmiID string
-	var chronografAmiID string
-	var kapacitorAmiID string
-
-	go func() {
-		defer waitForAmis.Done()
-		telegrafAmiID = buildAmi(t, filepath.Join(examplesDir, telegrafPackerInfo.templatePath), telegrafPackerInfo.builderName, awsRegion)
-	}()
-	go func() {
-		defer waitForAmis.Done()
-		influxdBAmiID = buildAmi(t, filepath.Join(examplesDir, influxdbPackerInfo.templatePath), influxdbPackerInfo.builderName, awsRegion)
-	}()
-	go func() {
-		defer waitForAmis.Done()
-		chronografAmiID = buildAmi(t, filepath.Join(examplesDir, chronografPackerInfo.templatePath), chronografPackerInfo.builderName, awsRegion)
-	}()
-	go func() {
-		defer waitForAmis.Done()
-		kapacitorAmiID = buildAmi(t, filepath.Join(examplesDir, kapacitorPackerInfo.templatePath), kapacitorPackerInfo.builderName, awsRegion)
-	}()
-
-	waitForAmis.Wait()
-
-	if (telegrafAmiID == "") || (influxdBAmiID == "") || (chronografAmiID == "") || (kapacitorAmiID == "") {
-		t.Fatalf("One of the AMIs was blank: telegraf:%s, influxdB:%s, chronograf:%s, kapacitor:%s", telegrafAmiID, influxdBAmiID, chronografAmiID, kapacitorAmiID)
-	}
-
-	return &InfluxAmis{
-		TelegrafAmiID:   telegrafAmiID,
-		InfluxdbAmiID:   influxdBAmiID,
-		ChronografAmiID: chronografAmiID,
-		KapacitorAmiID:  kapacitorAmiID,
-	}
-}
-
-type InfluxAmis struct {
-	TelegrafAmiID   string
-	InfluxdbAmiID   string
-	ChronografAmiID string
-	KapacitorAmiID  string
 }
