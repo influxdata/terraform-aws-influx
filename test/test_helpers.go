@@ -33,6 +33,16 @@ func buildAmi(t *testing.T, templatePath string, builderName string, awsRegion s
 	return packer.BuildArtifact(t, options)
 }
 
+func createPackerOptions(templatePath string, builderName string, region string) *packer.Options {
+	return &packer.Options{
+		Template: templatePath,
+		Only:     builderName,
+		Vars: map[string]string{
+			"aws_region": region,
+		},
+	}
+}
+
 func validateInfluxdb(t *testing.T, endpoint string, port string) {
 	databaseName := "automatedtest"
 	metric := "temperature"
