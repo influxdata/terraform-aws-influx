@@ -167,8 +167,12 @@ variable "ssh_port" {
 
 variable "tags" {
   description = "List of extra tag blocks added to the auto scaling group configuration. Each element in the list is a map containing keys 'key', 'value', and 'propagate_at_launch' mapped to the respective values."
-  type        = any
-  default     = []
+  type = list(object({
+    key                 = string
+    value               = string
+    propagate_at_launch = bool
+  }))
+  default = []
   # Example:
   #
   # default = [

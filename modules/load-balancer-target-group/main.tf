@@ -1,8 +1,3 @@
-# ---------------------------------------------------------------------------------------------------------------------
-# CREATE A TARGET GROUP
-# This will perform health checks on the servers and receive requests from the Listerers that match Listener Rules.
-# ---------------------------------------------------------------------------------------------------------------------
-
 # ----------------------------------------------------------------------------------------------------------------------
 # REQUIRE A SPECIFIC TERRAFORM VERSION OR HIGHER
 # This module has been updated with 0.12 syntax, which means it is no longer compatible with any versions below 0.12.
@@ -11,6 +6,11 @@
 terraform {
   required_version = ">= 0.12"
 }
+
+# ---------------------------------------------------------------------------------------------------------------------
+# CREATE A TARGET GROUP
+# This will perform health checks on the servers and receive requests from the Listerers that match Listener Rules.
+# ---------------------------------------------------------------------------------------------------------------------
 
 resource "aws_alb_target_group" "tg" {
   name                 = var.target_group_name

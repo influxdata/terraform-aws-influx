@@ -7,6 +7,10 @@ terraform {
   required_version = ">= 0.12"
 }
 
+# ----------------------------------------------------------------------------------------------------------------------
+# CREATE SECURITY GROUP RULES OPTIMIZED FOR INFLUXDB
+# ----------------------------------------------------------------------------------------------------------------------
+
 resource "aws_security_group_rule" "raft_port_cidr_blocks" {
   count             = signum(length(var.raft_port_cidr_blocks))
   type              = "ingress"

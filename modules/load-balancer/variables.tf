@@ -83,8 +83,11 @@ variable "idle_timeout" {
 
 variable "route53_records" {
   description = "A list of DNS A records to create in Route 53 that point at this Load Balancer. Each item in the list should be an object with the keys 'domain' (the domain name to create) and 'zone_id' (the Route 53 Hosted Zone ID in which to create the DNS A record)."
-  type        = any
-  default     = []
+  type = list(object({
+    domain  = string
+    zone_id = string
+  }))
+  default = []
   # Example:
   #
   # default = [
