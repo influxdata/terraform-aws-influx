@@ -11,6 +11,10 @@ terraform {
   required_version = ">= 0.12"
 }
 
+# ------------------------------------------------------------------------------
+# CREATE SECURITY GROUP RULES OPTIMIZED FOR CHRONOGRAF
+# ------------------------------------------------------------------------------
+
 resource "aws_security_group_rule" "http_port_cidr_blocks" {
   count             = length(var.http_port_cidr_blocks) >= 1 ? 1 : 0
   type              = "ingress"
