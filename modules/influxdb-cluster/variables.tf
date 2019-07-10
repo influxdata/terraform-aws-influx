@@ -182,7 +182,7 @@ variable "tags" {
     value               = string
     propagate_at_launch = bool
   }))
-  default     = []
+  default = []
   # Example:
   #
   # default = [
