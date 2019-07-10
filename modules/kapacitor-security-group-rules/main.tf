@@ -1,7 +1,3 @@
-# ---------------------------------------------------------------------------------------------------------------------
-# ATTACH SECURITY GROUP RULE TO ALLOW INCOMING CONNECTIONS ON KAPACITOR'S LISTENING PORT
-# ---------------------------------------------------------------------------------------------------------------------
-
 # ----------------------------------------------------------------------------------------------------------------------
 # REQUIRE A SPECIFIC TERRAFORM VERSION OR HIGHER
 # This module has been updated with 0.12 syntax, which means it is no longer compatible with any versions below 0.12.
@@ -10,6 +6,10 @@
 terraform {
   required_version = ">= 0.12"
 }
+
+# ---------------------------------------------------------------------------------------------------------------------
+# ATTACH SECURITY GROUP RULE TO ALLOW INCOMING CONNECTIONS ON KAPACITOR'S LISTENING PORT
+# ---------------------------------------------------------------------------------------------------------------------
 
 resource "aws_security_group_rule" "http_port_cidr_blocks" {
   count             = length(var.http_port_cidr_blocks) >= 1 ? 1 : 0

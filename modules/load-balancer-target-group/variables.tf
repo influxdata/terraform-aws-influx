@@ -50,12 +50,10 @@ variable "vpc_id" {
 
 variable "routing_condition" {
   description = "This variable defines the paths or domain names that will be routed to the servers. By default, we route all paths and domain names to the servers. To override this, you should pass in a list of maps, where each map has the keys field and values. See the Condition Blocks documentation for the syntax to use: https://www.terraform.io/docs/providers/aws/r/lb_listener_rule.html."
-  # We can't narrow the type down more than "any" because if we use list(object(...)), then all the fields in the
-  # object will be required (whereas some, such as encrypted, should be optional), and if we use list(map(...)), all
-  # the values in the map must be of the same type, whereas we need some to be strings, some to be array.
-  # So, we have to fall back to just any ugly "any."
-  type = any
-
+  type = list(object({
+    field  = string
+    values = list(string)
+  }))
   default = {
     field  = "path-pattern"
     values = ["*"]

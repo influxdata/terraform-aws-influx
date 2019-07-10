@@ -1,7 +1,3 @@
-# ---------------------------------------------------------------------------------------------------------------------
-# ATTACH AN IAM POLICY THAT ALLOWS THE INFLUXDB NODES TO AUTOMATICALLY DISCOVER EACH OTHER AND FORM A CLUSTER
-# ---------------------------------------------------------------------------------------------------------------------
-
 # ----------------------------------------------------------------------------------------------------------------------
 # REQUIRE A SPECIFIC TERRAFORM VERSION OR HIGHER
 # This module has been updated with 0.12 syntax, which means it is no longer compatible with any versions below 0.12.
@@ -10,6 +6,10 @@
 terraform {
   required_version = ">= 0.12"
 }
+
+# ---------------------------------------------------------------------------------------------------------------------
+# ATTACH AN IAM POLICY THAT ALLOWS THE INFLUXDB NODES TO AUTOMATICALLY DISCOVER EACH OTHER AND FORM A CLUSTER
+# ---------------------------------------------------------------------------------------------------------------------
 
 resource "aws_iam_role_policy" "auto_discover_cluster" {
   name   = "auto-discover-cluster"

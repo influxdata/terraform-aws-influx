@@ -1,7 +1,3 @@
-# ---------------------------------------------------------------------------------------------------------------------
-# CREATE AN AUTO SCALING GROUP (ASG) TO RUN INFLUXDB
-# ---------------------------------------------------------------------------------------------------------------------
-
 # ----------------------------------------------------------------------------------------------------------------------
 # REQUIRE A SPECIFIC TERRAFORM VERSION OR HIGHER
 # This module has been updated with 0.12 syntax, which means it is no longer compatible with any versions below 0.12.
@@ -10,6 +6,10 @@
 terraform {
   required_version = ">= 0.12"
 }
+
+# ---------------------------------------------------------------------------------------------------------------------
+# CREATE AN AUTO SCALING GROUP (ASG) TO RUN INFLUXDB
+# ---------------------------------------------------------------------------------------------------------------------
 
 resource "aws_autoscaling_group" "autoscaling_group" {
   name = var.cluster_name
@@ -25,14 +25,16 @@ resource "aws_autoscaling_group" "autoscaling_group" {
   health_check_grace_period = var.health_check_grace_period
   wait_for_capacity_timeout = var.wait_for_capacity_timeout
 
-  tags = flatten([
-    {
-      key                 = "Name"
-      value               = var.cluster_name
-      propagate_at_launch = true
-    },
-    var.tags,
-  ])
+  tags = concat(
+    [
+      {
+        key                 = "Name"
+        value               = var.cluster_name
+        propagate_at_launch = true
+      },
+    ],
+    var.tags
+  )
 }
 
 # ---------------------------------------------------------------------------------------------------------------------
