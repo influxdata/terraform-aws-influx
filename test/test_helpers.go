@@ -30,7 +30,17 @@ func buildAmi(t *testing.T, templatePath string, builderName string, awsRegion s
 		},
 	}
 
-	return packer.BuildAmi(t, options)
+	return packer.BuildArtifact(t, options)
+}
+
+func createPackerOptions(templatePath string, builderName string, region string) *packer.Options {
+	return &packer.Options{
+		Template: templatePath,
+		Only:     builderName,
+		Vars: map[string]string{
+			"aws_region": region,
+		},
+	}
 }
 
 func validateInfluxdb(t *testing.T, endpoint string, port string) {
@@ -123,16 +133,31 @@ func validateTelegraf(t *testing.T, endpoint string, port string, databaseName s
 
 	defer c.Close()
 
-	// Read from database
-	response, err := c.Query(client.Query{
-		Command:  "SELECT * FROM cpu",
-		Database: databaseName,
+	maxRetries := 30
+	sleepBetweenRetries := 10 * time.Second
+
+	retry.DoWithRetry(t, "Querying Telegraf database", maxRetries, sleepBetweenRetries, func() (string, error) {
+		// Read from database
+		response, err := c.Query(client.Query{
+			Command:  "SELECT * FROM cpu",
+			Database: databaseName,
+		})
+
+		if err != nil {
+			t.Logf("Query failed: %s", err.Error())
+			return "", err
+		}
+
+		if response.Error() != nil {
+			logger.Logf(t, "Query failed: %s", response.Error().Error())
+			return "", response.Error()
+		}
+
+		require.NoError(t, err, "Unable to read from database")
+		assert.NotEmpty(t, response.Results)
+
+		return "", nil
 	})
-
-	require.NoError(t, err, "Unable to read from database")
-	require.NoError(t, response.Error(), "Query failed")
-
-	assert.NotEmpty(t, response.Results)
 }
 
 func validateChronograf(t *testing.T, endpoint string, port string) {

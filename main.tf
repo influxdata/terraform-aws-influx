@@ -4,9 +4,22 @@
 # balancer in front of the data nodes to handle providing the public interface into the cluster.
 # ---------------------------------------------------------------------------------------------------------------------
 
+# ----------------------------------------------------------------------------------------------------------------------
+# REQUIRE A SPECIFIC TERRAFORM VERSION OR HIGHER
+# This module has been updated with 0.12 syntax, which means it is no longer compatible with any versions below 0.12.
+# ----------------------------------------------------------------------------------------------------------------------
+
+terraform {
+  required_version = ">= 0.12"
+}
+
+# ------------------------------------------------------------------------------
+# CONFIGURE OUR AWS CONNECTION
+# ------------------------------------------------------------------------------
+
 provider "aws" {
   # The AWS region in which all resources will be created
-  region = "${var.aws_region}"
+  region = var.aws_region
 }
 
 # ---------------------------------------------------------------------------------------------------------------------
@@ -40,8 +53,8 @@ data "aws_ami" "influxdb_ubuntu_example" {
   }
 }
 
-locals = {
-  ami_id = "${var.ami_id == "" ? data.aws_ami.influxdb_ubuntu_example.id : var.ami_id}"
+locals {
+  ami_id = var.ami_id == null ? data.aws_ami.influxdb_ubuntu_example.id : var.ami_id
 }
 
 module "influxdb" {
@@ -50,7 +63,7 @@ module "influxdb" {
   # source = "git::git@github.com:gruntwork-io/terraform-aws-influx.git//modules/influxdb-cluster?ref=v0.0.1"
   source = "./modules/influxdb-cluster"
 
-  cluster_name = "${var.influxdb_cluster_name}"
+  cluster_name = var.influxdb_cluster_name
   min_size     = 3
   max_size     = 3
 
@@ -58,15 +71,15 @@ module "influxdb" {
   # R4 or M4 instances.
   instance_type = "t2.micro"
 
-  ami_id    = "${local.ami_id}"
-  user_data = "${data.template_file.user_data_influxdb.rendered}"
+  ami_id    = local.ami_id
+  user_data = data.template_file.user_data_influxdb.rendered
 
-  vpc_id     = "${data.aws_vpc.default.id}"
-  subnet_ids = "${data.aws_subnet_ids.default.ids}"
+  vpc_id     = data.aws_vpc.default.id
+  subnet_ids = data.aws_subnet_ids.default.ids
 
   ebs_block_devices = [
     {
-      device_name = "${var.volume_device_name}"
+      device_name = var.volume_device_name
       volume_type = "gp2"
       volume_size = 50
     },
@@ -76,7 +89,7 @@ module "influxdb" {
   # recommend you limit this to the IP address ranges of known, trusted servers inside your VPC.
   allowed_ssh_cidr_blocks = ["0.0.0.0/0"]
 
-  ssh_key_name = "${var.ssh_key_name}"
+  ssh_key_name = var.ssh_key_name
 
   # To make it easy to test this example from your computer, we allow the InfluxDB servers to have public IPs. In a
   # production deployment, you'll probably want to keep all the servers in private subnets with only private IPs.
@@ -102,18 +115,19 @@ module "influxdb" {
 # ---------------------------------------------------------------------------------------------------------------------
 
 data "template_file" "user_data_influxdb" {
-  template = "${file("${path.module}/examples/influxdb-cluster-simple/user-data/user-data.sh")}"
+  template = file(
+    "${path.module}/examples/influxdb-cluster-simple/user-data/user-data.sh",
+  )
 
-  vars {
-    cluster_asg_name = "${var.influxdb_cluster_name}"
-    aws_region       = "${var.aws_region}"
-    license_key      = "${var.license_key}"
-    shared_secret    = "${var.shared_secret}"
-
+  vars = {
+    cluster_asg_name = var.influxdb_cluster_name
+    aws_region       = var.aws_region
+    license_key      = var.license_key
+    shared_secret    = var.shared_secret
     # Pass in the data about the EBS volumes so they can be mounted
-    volume_device_name = "${var.volume_device_name}"
-    volume_mount_point = "${var.volume_mount_point}"
-    volume_owner       = "${var.volume_owner}"
+    volume_device_name = var.volume_device_name
+    volume_mount_point = var.volume_mount_point
+    volume_owner       = var.volume_owner
   }
 }
 
@@ -128,7 +142,7 @@ module "influxdb_security_group_rules" {
   # source = "git::git@github.com:gruntwork-io/terraform-aws-influx.git//modules/influxdb-security-group-rules?ref=v0.0.1"
   source = "./modules/influxdb-security-group-rules"
 
-  security_group_id = "${module.influxdb.security_group_id}"
+  security_group_id = module.influxdb.security_group_id
 
   raft_port = 8089
   rest_port = 8091
@@ -155,7 +169,7 @@ module "influxdb_iam_policies" {
   # source = "git::git@github.com:gruntwork-io/terraform-aws-influx.git//modules/influxdb-iam-policies?ref=v0.0.1"
   source = "./modules/influxdb-iam-policies"
 
-  iam_role_id = "${module.influxdb.iam_role_id}"
+  iam_role_id = module.influxdb.iam_role_id
 }
 
 # ---------------------------------------------------------------------------------------------------------------------
@@ -169,8 +183,8 @@ module "load_balancer" {
   source = "./modules/load-balancer"
 
   name       = "${var.influxdb_cluster_name}-lb"
-  vpc_id     = "${data.aws_vpc.default.id}"
-  subnet_ids = "${data.aws_subnet_ids.default.ids}"
+  vpc_id     = data.aws_vpc.default.id
+  subnet_ids = data.aws_subnet_ids.default.ids
 
   http_listener_ports = [8086]
 
@@ -189,13 +203,13 @@ module "influxdb_target_group" {
   source = "./modules/load-balancer-target-group"
 
   target_group_name    = "${var.influxdb_cluster_name}-tg"
-  asg_name             = "${module.influxdb.asg_name}"
-  port                 = "${module.influxdb_security_group_rules.api_port}"
+  asg_name             = module.influxdb.asg_name
+  port                 = module.influxdb_security_group_rules.api_port
   health_check_path    = "/ping"
   health_check_matcher = "204"
-  vpc_id               = "${data.aws_vpc.default.id}"
+  vpc_id               = data.aws_vpc.default.id
 
-  listener_arns                   = ["${lookup(module.load_balancer.http_listener_arns, 8086)}"]
+  listener_arns                   = [module.load_balancer.http_listener_arns[8086]]
   listener_arns_num               = 1
   listener_rule_starting_priority = 100
 }
@@ -212,5 +226,5 @@ data "aws_vpc" "default" {
 }
 
 data "aws_subnet_ids" "default" {
-  vpc_id = "${data.aws_vpc.default.id}"
+  vpc_id = data.aws_vpc.default.id
 }
