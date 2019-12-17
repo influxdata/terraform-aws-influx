@@ -64,7 +64,7 @@ The general idea is to:
     modules to create an AMI with Chronograf installed.
 
     1. Deploy the AMI in a single Auto Scaling Group (ASG) using the [chronograf-server
-    module](https://github.com/gruntwork-io/terraform-aws-influx/tree/master/modules/chronograf-cluster).
+    module](https://github.com/gruntwork-io/terraform-aws-influx/tree/master/modules/chronograf-server).
 
     1. Configure the server to execute the 
     [run-chronograf](https://github.com/gruntwork-io/terraform-aws-influx/tree/master/modules/run-chronograf)
