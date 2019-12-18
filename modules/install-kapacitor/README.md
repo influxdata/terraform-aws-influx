@@ -5,8 +5,8 @@ This folder contains a script for installing Kapacitor and its dependencies.
 
 This script has been tested on the following operating systems:
 
-* Ubuntu 18.04
-* Amazon Linux 2
+- Ubuntu 18.04
+- Amazon Linux 2
 
 There is a good chance it will work on other flavors of Debian, CentOS, and RHEL as well.
 
@@ -28,12 +28,11 @@ Checkout the [releases](https://github.com/gruntwork-io/terraform-aws-influx/rel
 
 The `install-kapacitor` script will install the Kapacitor binary as well as its dependencies.
 
-We recommend running the `install-kapacitor` script as part of a [Packer](https://www.packer.io/) template to 
+We recommend running the `install-kapacitor` script as part of a [Packer](https://www.packer.io/) template to
 create a Kapacitor [Amazon Machine Image (AMI)](http://docs.aws.amazon.com/AWSEC2/latest/UserGuide/AMIs.html).
-You can then deploy the AMI across an Auto Scaling Group using the [kapacitor-cluster 
-module](https://github.com/gruntwork-io/terraform-aws-influx/tree/master/modules/kapacitor-cluster) (see the 
+You can then deploy the AMI across an Auto Scaling Group using the [kapacitor-server
+module](https://github.com/gruntwork-io/terraform-aws-influx/tree/master/modules/kapacitor-server) (see the
 [examples folder](https://github.com/gruntwork-io/terraform-aws-influx/tree/master/examples) for fully-working sample code).
-
 
 ## Command line Arguments
 
