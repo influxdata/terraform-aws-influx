@@ -24,9 +24,8 @@ To build the InfluxDB AMI:
 1. To build an Amazon Linux AMI for InfluxDB Enterprise: `packer build -only=amazon-linux-ami influxdb.json`.
 
 When the build finishes, it will output the IDs of the new AMIs. To see how to deploy this AMI, check out the 
-[influxdb-cluster-simple](https://github.com/gruntwork-io/terraform-aws-influx/tree/master/examples/influxdb-cluster-simple) and
-[influxdb-multi-cluster](https://github.com/gruntwork-io/terraform-aws-influx/tree/master/examples/influxdb-multi-cluster) 
-examples.
+[influxdb-cluster-simple](https://github.com/gruntwork-io/terraform-aws-influx/tree/master/examples/influxdb-cluster-simple)
+example.
 
 ## Creating your own Packer template for production usage
 
@@ -75,6 +74,4 @@ local checkout of the Module, uploaded from your own computer via the `file` pro
 
 The Packer template in this example folder can build not only AMIs, but also Docker images for local testing. This is
 convenient for testing out the various scripts in the `modules` folder without having to wait for an AMI to build and
-a bunch of EC2 Instances to boot up. See the [influxdb-docker 
-folder](https://github.com/gruntwork-io/terraform-aws-influx/tree/master/examples/influxdb-docker) for
-instructions.
+a bunch of EC2 Instances to boot up.
