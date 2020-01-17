@@ -14,7 +14,7 @@ You will need to create an [Amazon Machine Image (AMI)](http://docs.aws.amazon.c
 that has InfluxDB installed, which you can do using the [influxdb-ami 
 example](https://github.com/gruntwork-io/terraform-aws-influx/tree/master/examples/influxdb-ami)). 
 
-For more info on how the InfluxDB cluster works, check out the 
+To see an example of InfluxDB deployed across separate clusters, see the [tick-multi-cluster example](https://github.com/gruntwork-io/terraform-aws-influx/tree/master/examples/tick-multi-cluster). For more info on how the InfluxDB cluster works, check out the 
 [influxdb-cluster](https://github.com/gruntwork-io/terraform-aws-influx/tree/master/modules/influxdb-cluster) documentation.
 
 ## Quick start

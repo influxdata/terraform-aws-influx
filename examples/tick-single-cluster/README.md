@@ -1,7 +1,7 @@
 # TICK Single Cluster Example
 
 This folder shows an example of Terraform code that uses the
-tick-cluster
+[influxdb-cluster](https://github.com/gruntwork-io/terraform-aws-influx/tree/master/modules/influxdb-cluster)
 module to deploy a [TICK stack](https://www.influxdata.com/time-series-platform/) cluster in [AWS](https://aws.amazon.com/).
 
 This example also deploys a Load Balancer in front of the TICK cluster using the [load-balancer

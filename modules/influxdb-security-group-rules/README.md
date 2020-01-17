@@ -6,8 +6,7 @@ These rules are defined in a separate module so that you can add them to any exi
 
 ## Quick start
 
-Let's say you want to deploy influx using the [influxdb-cluster 
-module](/modules/influxdb-cluster/README.md): 
+Let's say you want to deploy influx using the [influxdb-cluster module](https://github.com/gruntwork-io/terraform-aws-influx/blob/master/modules/influx-cluster): 
 
 ```hcl
 module "influxdb_meta_cluster" {
