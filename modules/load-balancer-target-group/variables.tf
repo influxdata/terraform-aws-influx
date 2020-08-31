@@ -49,7 +49,7 @@ variable "vpc_id" {
 # ---------------------------------------------------------------------------------------------------------------------
 
 variable "routing_condition" {
-  description = "This variable defines the paths or domain names that will be routed to the servers. By default, we route all paths and domain names to the servers. To override this, you should pass in a list of maps, where each map has the keys field and values. See the Condition Blocks documentation for the syntax to use: https://www.terraform.io/docs/providers/aws/r/lb_listener_rule.html."
+  description = "This variable defines the paths or domain names that will be routed to the servers. By default, we route all paths and domain names to the servers. The following condition fields are supported: host-header, http-request-method, path-pattern, source-ip. See the Condition Blocks documentation for the syntax to use: https://www.terraform.io/docs/providers/aws/r/lb_listener_rule.html."
   type = object({
     field  = string
     values = list(string)

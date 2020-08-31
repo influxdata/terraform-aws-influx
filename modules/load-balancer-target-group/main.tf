@@ -43,13 +43,43 @@ resource "aws_alb_listener_rule" "http_path" {
   priority     = var.listener_rule_starting_priority + count.index
 
   action {
-    target_group_arn = aws_alb_target_group.tg.arn
     type             = "forward"
+    target_group_arn = aws_alb_target_group.tg.arn
   }
 
-  condition {
-    field  = var.routing_condition.field
-    values = var.routing_condition.values
+  dynamic "condition" {
+    for_each = var.routing_condition != null ? [var.routing_condition] : []
+
+    content {
+      dynamic "http_header" {
+        for_each = condition.value.field == "http-header" ? [var.routing_condition] : []
+        content {
+          values = http_header.value.values
+        }
+      }
+
+      dynamic "http_request_method" {
+        for_each = condition.value.field == "http-request-method" ? [var.routing_condition] : []
+        content {
+          values = http_request_method.value.values
+        }
+      }
+
+      dynamic "path_pattern" {
+        for_each = condition.value.field == "path-pattern" ? [var.routing_condition] : []
+        content {
+          values = path_pattern.value.values
+        }
+      }
+
+      dynamic "source_ip" {
+        for_each = condition.value.field == "source-ip" ? [var.routing_condition] : []
+        content {
+          values = source_ip.value.values
+        }
+      }
+    }
+
   }
 }
 
