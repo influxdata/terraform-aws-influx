@@ -51,10 +51,10 @@ resource "aws_alb_listener_rule" "http_path" {
     for_each = var.routing_condition != null ? [var.routing_condition] : []
 
     content {
-      dynamic "http_header" {
-        for_each = condition.value.field == "http-header" ? [var.routing_condition] : []
+      dynamic "host_header" {
+        for_each = condition.value.field == "host-header" ? [var.routing_condition] : []
         content {
-          values = http_header.value.values
+          values = host_header.value.values
         }
       }
 
