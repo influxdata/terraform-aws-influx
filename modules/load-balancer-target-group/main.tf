@@ -11,7 +11,7 @@ terraform {
   required_providers {
     aws = {
       source  = "hashicorp/aws"
-      version = ">= 3.0"
+      version = "~> 2.6"
     }
   }
 }
@@ -56,6 +56,9 @@ resource "aws_alb_listener_rule" "http_path" {
     target_group_arn = aws_alb_target_group.tg.arn
   }
 
+  # For backwards compatibility and to support the input format, we translate the old field and values pattern to the
+  # nested subblock pattern in AWS provider v3. Only one of the sub blocks will be included based on the value of the
+  # `field` attribute of `routing_condition`.
   dynamic "condition" {
     for_each = var.routing_condition != null ? [var.routing_condition] : []
 
@@ -88,7 +91,6 @@ resource "aws_alb_listener_rule" "http_path" {
         }
       }
     }
-
   }
 }
 
