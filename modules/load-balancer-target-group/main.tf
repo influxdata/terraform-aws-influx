@@ -4,7 +4,15 @@
 # ----------------------------------------------------------------------------------------------------------------------
 
 terraform {
-  required_version = ">= 0.12"
+  # Source is required for required_providers in TF 13, but is only compatible with TF 12 starting 0.12.26.
+  required_version = ">= 0.12.26"
+
+  required_providers {
+    aws = {
+      source  = "hashicorp/aws"
+      version = ">= 2.6"
+    }
+  }
 }
 
 # ---------------------------------------------------------------------------------------------------------------------
@@ -43,13 +51,45 @@ resource "aws_alb_listener_rule" "http_path" {
   priority     = var.listener_rule_starting_priority + count.index
 
   action {
-    target_group_arn = aws_alb_target_group.tg.arn
     type             = "forward"
+    target_group_arn = aws_alb_target_group.tg.arn
   }
 
-  condition {
-    field  = var.routing_condition.field
-    values = var.routing_condition.values
+  # For backwards compatibility and to support the input format, we translate the old field and values pattern to the
+  # nested subblock pattern in AWS provider v3. Only one of the sub blocks will be included based on the value of the
+  # `field` attribute of `routing_condition`.
+  dynamic "condition" {
+    for_each = var.routing_condition != null ? [var.routing_condition] : []
+
+    content {
+      dynamic "host_header" {
+        for_each = condition.value.field == "host-header" ? [var.routing_condition] : []
+        content {
+          values = host_header.value.values
+        }
+      }
+
+      dynamic "http_request_method" {
+        for_each = condition.value.field == "http-request-method" ? [var.routing_condition] : []
+        content {
+          values = http_request_method.value.values
+        }
+      }
+
+      dynamic "path_pattern" {
+        for_each = condition.value.field == "path-pattern" ? [var.routing_condition] : []
+        content {
+          values = path_pattern.value.values
+        }
+      }
+
+      dynamic "source_ip" {
+        for_each = condition.value.field == "source-ip" ? [var.routing_condition] : []
+        content {
+          values = source_ip.value.values
+        }
+      }
+    }
   }
 }
 

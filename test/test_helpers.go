@@ -59,7 +59,7 @@ func validateInfluxdb(t *testing.T, endpoint string, port string) {
 
 	defer c.Close()
 
-	maxRetries := 15
+	maxRetries := 30
 	sleepBetweenRetries := 5 * time.Second
 
 	// Create database
@@ -167,7 +167,7 @@ func validateChronograf(t *testing.T, endpoint string, port string) {
 
 	logger.Log(t, "Checking URL: %s", url)
 
-	http_helper.HttpGetWithRetryWithCustomValidation(t, url, maxRetries, sleepBetweenRetries, func(status int, body string) bool {
+	http_helper.HttpGetWithRetryWithCustomValidation(t, url, nil, maxRetries, sleepBetweenRetries, func(status int, body string) bool {
 		return status == 200
 	})
 }
@@ -179,7 +179,7 @@ func validateKapacitor(t *testing.T, endpoint string, port string) {
 
 	logger.Log(t, "Checking URL: %s", url)
 
-	http_helper.HttpGetWithRetryWithCustomValidation(t, url, maxRetries, sleepBetweenRetries, func(status int, body string) bool {
+	http_helper.HttpGetWithRetryWithCustomValidation(t, url, nil, maxRetries, sleepBetweenRetries, func(status int, body string) bool {
 		return status == 204
 	})
 }

@@ -10,7 +10,7 @@
   },
   "builders": [{
     "name": "tick-ami-ubuntu",
-    "ami_name": "{{user `base_ami_name`}}-ubuntu-example-{{uuid | clean_ami_name}}",
+    "ami_name": "{{user `base_ami_name`}}-ubuntu-example-{{uuid | clean_resource_name}}",
     "ami_description": "An Ubuntu 18.04 AMI that has the TICK stack installed.",
     "instance_type": "t2.micro",
     "region": "{{user `aws_region`}}",
@@ -29,7 +29,7 @@
     "ssh_username": "ubuntu"
   },{
     "name": "tick-ami-amazon-linux",
-    "ami_name": "{{user `base_ami_name`}}-amazon-linux-example-{{uuid | clean_ami_name}}",
+    "ami_name": "{{user `base_ami_name`}}-amazon-linux-example-{{uuid | clean_resource_name}}",
     "ami_description": "An Amazon Linux 2 AMI that has the TICK stack installed.",
     "instance_type": "t2.micro",
     "region": "{{user `aws_region`}}",
