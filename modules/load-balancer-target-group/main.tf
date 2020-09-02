@@ -7,11 +7,10 @@ terraform {
   # Source is required for required_providers in TF 13, but is only compatible with TF 12 starting 0.12.26.
   required_version = ">= 0.12.26"
 
-  # Using provider v3.0 syntax for aws_alb_listener_rule condition blocks.
   required_providers {
     aws = {
       source  = "hashicorp/aws"
-      version = "~> 2.6"
+      version = ">= 2.6"
     }
   }
 }
