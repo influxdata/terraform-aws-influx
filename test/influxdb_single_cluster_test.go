@@ -70,6 +70,12 @@ func TestInfluxDBSingleCluster(t *testing.T) {
 			})
 
 			test_structure.RunTestStage(t, "setup_ami", func() {
+				licenseKey := os.Getenv("LICENSE_KEY")
+				sharedSecret := os.Getenv("SHARED_SECRET")
+
+				require.NotEmpty(t, licenseKey, "License key must be set as an env var and not included as plain-text")
+				require.NotEmpty(t, sharedSecret, "Shared secret must be set as an env var and not included as plain-text")
+
 				awsRegion := aws.GetRandomRegion(t, nil, []string{"eu-north-1"})
 				amiID := buildAmi(t, templatePath, testCase.packerInfo.builderName, awsRegion)
 
@@ -78,12 +84,6 @@ func TestInfluxDBSingleCluster(t *testing.T) {
 
 				keyPair := aws.CreateAndImportEC2KeyPair(t, awsRegion, uniqueID)
 				test_structure.SaveEc2KeyPair(t, examplesDir, keyPair)
-
-				licenseKey := os.Getenv("LICENSE_KEY")
-				sharedSecret := os.Getenv("SHARED_SECRET")
-
-				require.NotEmpty(t, licenseKey, "License key must be set as an env var and not included as plain-text")
-				require.NotEmpty(t, sharedSecret, "Shared secret must be set as an env var and not included as plain-text")
 
 				terraformOptions := &terraform.Options{
 					// The path to where your Terraform code is located
