@@ -123,6 +123,15 @@
   },{
     "type": "shell",
     "inline": [
+       "sudo apt-get install -y jq dos2unix",
+      "dos2unix /tmp/terraform-aws-influx/modules/install-telegraf/install-telegraf",
+      "dos2unix /tmp/terraform-aws-influx/modules/install-influxdb/install-influxdb",
+      "dos2unix /tmp/terraform-aws-influx/modules/install-chronograf/install-chronograf",
+      "dos2unix /tmp/terraform-aws-influx/modules/install-kapacitor/install-kapacitor",
+      "sudo chmod +x /tmp/terraform-aws-influx/modules/install-telegraf/install-telegraf",
+      "sudo chmod +x /tmp/terraform-aws-influx/modules/install-influxdb/install-influxdb",
+      "sudo chmod +x /tmp/terraform-aws-influx/modules/install-chronograf/install-chronograf",
+      "sudo chmod +x /tmp/terraform-aws-influx/modules/install-kapacitor/install-kapacitor",
       "/tmp/terraform-aws-influx/modules/install-telegraf/install-telegraf --version {{user `telegraf_version`}}",
       "/tmp/terraform-aws-influx/modules/install-influxdb/install-influxdb --version {{user `influxdb_version`}}",
       "/tmp/terraform-aws-influx/modules/install-chronograf/install-chronograf --version {{user `chronograf_version`}}",
