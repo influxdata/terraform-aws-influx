@@ -77,14 +77,16 @@
     "type": "shell",
     "inline": [
       "DEBIAN_FRONTEND=noninteractive apt-get update -y",
-      "apt-get install -y sudo wget git jq systemd"
+      "apt-get install -y sudo wget git jq systemd",
+      "sudo apt-get install -y jq dos2unix"
     ],
     "only": ["tick-docker-ubuntu"]
   },{
     "type": "shell",
     "inline": [
       "yum update -y",
-      "yum install -y sudo wget git jq hostname"
+      "yum install -y sudo wget git jq hostname",
+      "yum install -y jq dos2unix"
     ],
     "only": ["tick-docker-amazon-linux"]
   },{
@@ -123,7 +125,6 @@
   },{
     "type": "shell",
     "inline": [
-       "sudo apt-get install -y jq dos2unix",
       "dos2unix /tmp/terraform-aws-influx/modules/install-telegraf/install-telegraf",
       "dos2unix /tmp/terraform-aws-influx/modules/install-influxdb/install-influxdb",
       "dos2unix /tmp/terraform-aws-influx/modules/install-chronograf/install-chronograf",
