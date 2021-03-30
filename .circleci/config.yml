@@ -45,6 +45,7 @@ jobs:
 
   test:
     <<: *defaults
+    <<: *env
     steps:
       - checkout
       - run: echo 'export PATH=$HOME/terraform:$HOME/packer:$PATH' >> $BASH_ENV
@@ -68,6 +69,7 @@ jobs:
 
   release:
     <<: *defaults
+    <<: *env
     steps:
       - checkout
 
