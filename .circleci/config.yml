@@ -1,13 +1,14 @@
 defaults: &defaults
   machine: true
-  environment:
-    GRUNTWORK_INSTALLER_VERSION: v0.0.30
-    TERRATEST_LOG_PARSER_VERSION: v0.30.10
-    MODULE_CI_VERSION: v0.29.0
-    TERRAFORM_VERSION: 0.13.4
-    TERRAGRUNT_VERSION: NONE
-    PACKER_VERSION: 1.6.1
-    GOLANG_VERSION: 1.14
+
+env: &env
+  GRUNTWORK_INSTALLER_VERSION: v0.0.30
+  TERRATEST_LOG_PARSER_VERSION: v0.30.10
+  MODULE_CI_VERSION: v0.29.0
+  TERRAFORM_VERSION: 0.13.4
+  TERRAGRUNT_VERSION: NONE
+  PACKER_VERSION: 1.6.1
+  GOLANG_VERSION: 1.14
 
 install_gruntwork_utils: &install_gruntwork_utils
   name: install gruntwork utils
@@ -23,8 +24,10 @@ install_gruntwork_utils: &install_gruntwork_utils
 
 version: 2
 jobs:
-  build:
-    <<: *defaults
+  precommit:
+    <<: *env
+    docker:
+      - image: circleci/python:3.8.1
     steps:
       - checkout
       # Install gruntwork utilities
@@ -33,22 +36,15 @@ jobs:
 
       # Fail the build if the pre-commit hooks don't pass. Note: if you run pre-commit install locally, these hooks will
       # execute automatically every time before you commit, ensuring the build never fails at this step!
-      - run: pip install pre-commit==1.11.2 cfgv==2.0.1 yapf
-      - run: pre-commit install
-      - run: pre-commit run --all-files
-
-      - persist_to_workspace:
-          root: /home/circleci
-          paths:
-            - project
-            - terraform
-            - packer
+      - run:
+          command: |
+            pip install pre-commit==1.21.0 cfgv==2.0.1 zipp==1.1.0 yapf
+            pre-commit install
+            pre-commit run --all-files
 
   test:
     <<: *defaults
     steps:
-      - attach_workspace:
-          at: /home/circleci
       - checkout
       - run: echo 'export PATH=$HOME/terraform:$HOME/packer:$PATH' >> $BASH_ENV
       - run:
@@ -88,12 +84,12 @@ workflows:
   version: 2
   build-and-test:
     jobs:
-      - build:
+      - precommit:
           context:
             - Gruntwork Admin
       - test:
           requires:
-            - build
+            - precommit
           context:
             - Gruntwork Admin
       - release:
