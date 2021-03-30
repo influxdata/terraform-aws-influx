@@ -2,13 +2,14 @@ defaults: &defaults
   machine: true
 
 env: &env
-  GRUNTWORK_INSTALLER_VERSION: v0.0.30
-  TERRATEST_LOG_PARSER_VERSION: v0.30.10
-  MODULE_CI_VERSION: v0.29.0
-  TERRAFORM_VERSION: 0.13.4
-  TERRAGRUNT_VERSION: NONE
-  PACKER_VERSION: 1.6.1
-  GOLANG_VERSION: 1.14
+  environment:
+    GRUNTWORK_INSTALLER_VERSION: v0.0.30
+    TERRATEST_LOG_PARSER_VERSION: v0.30.10
+    MODULE_CI_VERSION: v0.29.0
+    TERRAFORM_VERSION: 0.13.4
+    TERRAGRUNT_VERSION: NONE
+    PACKER_VERSION: 1.6.1
+    GOLANG_VERSION: 1.14
 
 install_gruntwork_utils: &install_gruntwork_utils
   name: install gruntwork utils
