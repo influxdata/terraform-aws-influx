@@ -1,5 +1,7 @@
 defaults: &defaults
   machine: true
+
+env: &env
   environment:
     GRUNTWORK_INSTALLER_VERSION: v0.0.30
     TERRATEST_LOG_PARSER_VERSION: v0.30.10
@@ -13,7 +15,7 @@ install_gruntwork_utils: &install_gruntwork_utils
   name: install gruntwork utils
   command: |
     curl -Ls https://raw.githubusercontent.com/gruntwork-io/gruntwork-installer/master/bootstrap-gruntwork-installer.sh | bash /dev/stdin --version "${GRUNTWORK_INSTALLER_VERSION}"
-    gruntwork-install --module-name "gruntwork-module-circleci-helpers" --repo "https://github.com/gruntwork-io/module-ci" --tag "${MODULE_CI_VERSION}"
+    gruntwork-install --module-name "gruntwork-module-circleci-helpers" --repo "https://github.com/gruntwork-io/terraform-aws-ci" --tag "${MODULE_CI_VERSION}"
     gruntwork-install --binary-name "terratest_log_parser" --repo "https://github.com/gruntwork-io/terratest" --tag "${TERRATEST_LOG_PARSER_VERSION}"
     configure-environment-for-gruntwork-module \
       --terraform-version ${TERRAFORM_VERSION} \
@@ -23,8 +25,10 @@ install_gruntwork_utils: &install_gruntwork_utils
 
 version: 2
 jobs:
-  build:
-    <<: *defaults
+  precommit:
+    <<: *env
+    docker:
+      - image: circleci/python:3.8.1
     steps:
       - checkout
       # Install gruntwork utilities
@@ -33,22 +37,16 @@ jobs:
 
       # Fail the build if the pre-commit hooks don't pass. Note: if you run pre-commit install locally, these hooks will
       # execute automatically every time before you commit, ensuring the build never fails at this step!
-      - run: pip install pre-commit==1.11.2 cfgv==2.0.1 yapf
-      - run: pre-commit install
-      - run: pre-commit run --all-files
-
-      - persist_to_workspace:
-          root: /home/circleci
-          paths:
-            - project
-            - terraform
-            - packer
+      - run:
+          command: |
+            pip install pre-commit==1.21.0 cfgv==2.0.1 zipp==1.1.0 yapf
+            pre-commit install
+            pre-commit run --all-files
 
   test:
     <<: *defaults
+    <<: *env
     steps:
-      - attach_workspace:
-          at: /home/circleci
       - checkout
       - run: echo 'export PATH=$HOME/terraform:$HOME/packer:$PATH' >> $BASH_ENV
       - run:
@@ -71,6 +69,7 @@ jobs:
 
   release:
     <<: *defaults
+    <<: *env
     steps:
       - checkout
 
@@ -88,12 +87,12 @@ workflows:
   version: 2
   build-and-test:
     jobs:
-      - build:
+      - precommit:
           context:
             - Gruntwork Admin
       - test:
           requires:
-            - build
+            - precommit
           context:
             - Gruntwork Admin
       - release:

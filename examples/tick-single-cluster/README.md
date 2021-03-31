@@ -19,7 +19,7 @@ example](https://github.com/gruntwork-io/terraform-aws-influx/blob/master/exampl
 1. A single _all in one server_ behind an ASG where we run 
     [telegraf](/modules/run-telegraf), [influxdb](/modules/run-influxdb),
     [chronograf](/modules/run-chronograf) and [kapacitor](/modules/run-kapacitor)
-1. An [Application Load Balancer](https://github.com/gruntwork-io/module-load-balancer)
+1. An [Application Load Balancer](https://github.com/gruntwork-io/terraform-aws-load-balancer)
 
 You will need to create [Amazon Machine Images (AMIs)](http://docs.aws.amazon.com/AWSEC2/latest/UserGuide/AMIs.html) 
 that have all of the TICK-stack components installed. You can do this using: 
