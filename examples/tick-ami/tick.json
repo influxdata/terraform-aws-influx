@@ -77,14 +77,16 @@
     "type": "shell",
     "inline": [
       "DEBIAN_FRONTEND=noninteractive apt-get update -y",
-      "apt-get install -y sudo wget git jq systemd"
+      "apt-get install -y sudo wget git jq systemd",
+      "sudo apt-get install -y jq dos2unix"
     ],
     "only": ["tick-docker-ubuntu"]
   },{
     "type": "shell",
     "inline": [
       "yum update -y",
-      "yum install -y sudo wget git jq hostname"
+      "yum install -y sudo wget git jq hostname",
+      "yum install -y jq dos2unix"
     ],
     "only": ["tick-docker-amazon-linux"]
   },{
@@ -123,6 +125,14 @@
   },{
     "type": "shell",
     "inline": [
+      "dos2unix /tmp/terraform-aws-influx/modules/install-telegraf/install-telegraf",
+      "dos2unix /tmp/terraform-aws-influx/modules/install-influxdb/install-influxdb",
+      "dos2unix /tmp/terraform-aws-influx/modules/install-chronograf/install-chronograf",
+      "dos2unix /tmp/terraform-aws-influx/modules/install-kapacitor/install-kapacitor",
+      "sudo chmod +x /tmp/terraform-aws-influx/modules/install-telegraf/install-telegraf",
+      "sudo chmod +x /tmp/terraform-aws-influx/modules/install-influxdb/install-influxdb",
+      "sudo chmod +x /tmp/terraform-aws-influx/modules/install-chronograf/install-chronograf",
+      "sudo chmod +x /tmp/terraform-aws-influx/modules/install-kapacitor/install-kapacitor",
       "/tmp/terraform-aws-influx/modules/install-telegraf/install-telegraf --version {{user `telegraf_version`}}",
       "/tmp/terraform-aws-influx/modules/install-influxdb/install-influxdb --version {{user `influxdb_version`}}",
       "/tmp/terraform-aws-influx/modules/install-chronograf/install-chronograf --version {{user `chronograf_version`}}",
